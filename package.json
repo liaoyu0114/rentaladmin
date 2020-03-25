@@ -5,13 +5,17 @@
   "scripts": {
     "dev": "npm run serve",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "upload": "node upload.js",
+    "deploy": "npm run build && npm run upload"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.11.0",
     "mavon-editor": "^2.6.17",
+    "ora": "^4.0.3",
+    "scp2": "^0.5.0",
     "vue": "^2.6.10",
     "vue-barcode": "^1.2.0",
     "vue-cropperjs": "^3.0.0",

@@ -101,11 +101,6 @@ export default new Router({
                     path: '/donate',
                     component: () => import(/* webpackChunkName: "donate" */ '../components/page/Donate.vue'),
                     meta: { title: '支持作者' }
-                },
-                {
-                    path: '/order',
-                    component: () => import(/* webpackChunkName: "donate" */ '../components/page/Order/OrderPage.vue'),
-                    meta: { title: '订单' }
                 }
             ]
         },
