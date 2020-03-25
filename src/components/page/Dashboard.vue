@@ -12,11 +12,11 @@
                     </div>
                     <div class="user-info-list">
                         上次登录时间：
-                        <span>2019-11-01</span>
+                        <span>{{date}}</span>
                     </div>
                     <div class="user-info-list">
                         上次登录地点：
-                        <span>东莞</span>
+                        <span>成都</span>
                     </div>
                 </el-card>
                 <el-card shadow="hover" style="height:252px;">
@@ -117,29 +117,30 @@ export default {
     data() {
         return {
             name: localStorage.getItem('ms_username'),
+            date: new Date().toLocaleDateString(),
             todoList: [
                 {
-                    title: '今天要修复100个bug',
+                    title: '东西没了要下架',
                     status: false
                 },
                 {
-                    title: '今天要修复100个bug',
+                    title: '今天要买100个苹果',
                     status: false
                 },
                 {
-                    title: '今天要写100行代码加几个bug吧',
+                    title: '明天要新增菜品',
                     status: false
                 },
                 {
-                    title: '今天要修复100个bug',
+                    title: '明天下架脆皮鸡和xxxx',
                     status: false
                 },
                 {
-                    title: '今天要修复100个bug',
+                    title: '今天要买100斤葱',
                     status: true
                 },
                 {
-                    title: '今天要写100行代码加几个bug吧',
+                    title: '今天要写五点打烊',
                     status: true
                 }
             ],
@@ -176,7 +177,7 @@ export default {
             options: {
                 type: 'bar',
                 title: {
-                    text: '最近一周各品类销售图'
+                    text: '最近一周新增用户和销量图'
                 },
                 xRorate: 25,
                 labels: ['周一', '周二', '周三', '周四', '周五'],

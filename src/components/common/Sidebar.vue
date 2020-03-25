@@ -69,7 +69,12 @@ export default {
                 {
                     icon: 'el-icon-lx-copy',
                     index: 'tabs',
-                    title: 'tab选项卡'
+                    title: '订单管理'
+                },
+                {
+                    icon: 'el-icon-lx-copy',
+                    index: 'order',
+                    title: '订单'
                 },
                 {
                     icon: 'el-icon-lx-calendar',

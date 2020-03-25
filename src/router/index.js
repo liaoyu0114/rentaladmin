@@ -32,7 +32,7 @@ export default new Router({
                 {
                     path: '/tabs',
                     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: 'tab选项卡' }
+                    meta: { title: '订单管理' }
                 },
                 {
                     path: '/form',
@@ -101,6 +101,11 @@ export default new Router({
                     path: '/donate',
                     component: () => import(/* webpackChunkName: "donate" */ '../components/page/Donate.vue'),
                     meta: { title: '支持作者' }
+                },
+                {
+                    path: '/order',
+                    component: () => import(/* webpackChunkName: "donate" */ '../components/page/Order/OrderPage.vue'),
+                    meta: { title: '订单' }
                 }
             ]
         },

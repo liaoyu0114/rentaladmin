@@ -1,62 +1,96 @@
 <template>
-    <div class="">
+    <div class>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-copy"></i> tab选项卡</el-breadcrumb-item>
+                <el-breadcrumb-item>
+                    <i class="el-icon-lx-copy"></i> 订单管理
+                </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
             <el-tabs v-model="message">
-                <el-tab-pane :label="`未读消息(${unread.length})`" name="first">
-                    <el-table :data="unread" :show-header="false" style="width: 100%">
+                <el-tab-pane :label="`所有订单(${orders.length})`" name="first">
+                    <el-table :data="orders" :show-header="false" style="width: 100%">
                         <el-table-column>
                             <template slot-scope="scope">
-                                <span class="message-title">{{scope.row.title}}</span>
+                                <order-item :scope="scope"></order-item>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="date" width="180"></el-table-column>
+                        <!-- <el-table-column prop="date" width="180"></el-table-column>
                         <el-table-column width="120">
                             <template slot-scope="scope">
-                                <el-button size="small" @click="handleRead(scope.$index)">标为已读</el-button>
+                                <el-button size="small" @click="handleRead(scope.$index)">确认订单</el-button>
                             </template>
-                        </el-table-column>
+                        </el-table-column>-->
                     </el-table>
                     <div class="handle-row">
-                        <el-button type="primary">全部标为已读</el-button>
+                        <el-button type="primary">全部确认</el-button>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane :label="`已读消息(${read.length})`" name="second">
+
+                <el-tab-pane :label="`未接单(${getOrders1.length})`" name="second">
                     <template v-if="message === 'second'">
-                        <el-table :data="read" :show-header="false" style="width: 100%">
+                        <el-table :data="getOrders1" :show-header="false" style="width: 100%">
                             <el-table-column>
                                 <template slot-scope="scope">
-                                    <span class="message-title">{{scope.row.title}}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="date" width="150"></el-table-column>
-                            <el-table-column width="120">
-                                <template slot-scope="scope">
-                                    <el-button type="danger" @click="handleDel(scope.$index)">删除</el-button>
+                                    <order-item :scope="scope"></order-item>
                                 </template>
                             </el-table-column>
                         </el-table>
                         <div class="handle-row">
-                            <el-button type="danger">删除全部</el-button>
+                            <el-button type="danger">取消订单</el-button>
                         </div>
                     </template>
                 </el-tab-pane>
-                <el-tab-pane :label="`回收站(${recycle.length})`" name="third">
+                <el-tab-pane :label="`已接单(${getOrders2.length})`" name="third">
                     <template v-if="message === 'third'">
-                        <el-table :data="recycle" :show-header="false" style="width: 100%">
+                        <el-table :data="getOrders2" :show-header="false" style="width: 100%">
                             <el-table-column>
                                 <template slot-scope="scope">
-                                    <span class="message-title">{{scope.row.title}}</span>
+                                    <order-item :scope="scope"></order-item>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="date" width="150"></el-table-column>
-                            <el-table-column width="120">
+                        </el-table>
+                        <div class="handle-row">
+                            <el-button type="danger">清空回收站</el-button>
+                        </div>
+                    </template>
+                </el-tab-pane>
+                <el-tab-pane :label="`配送中(${getOrders3.length})`" name="fourth">
+                    <template v-if="message === 'fourth'">
+                        <el-table :data="getOrders3" :show-header="false" style="width: 100%">
+                            <el-table-column>
                                 <template slot-scope="scope">
-                                    <el-button @click="handleRestore(scope.$index)">还原</el-button>
+                                    <order-item :scope="scope"></order-item>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="handle-row">
+                            <el-button type="danger">清空回收站</el-button>
+                        </div>
+                    </template>
+                </el-tab-pane>
+                <el-tab-pane :label="`已完成(${getOrders4.length})`" name="fifth">
+                    <template v-if="message === 'fifth'">
+                        <el-table :data="getOrders4" :show-header="false" style="width: 100%">
+                            <el-table-column>
+                                <template slot-scope="scope">
+                                    <order-item :scope="scope"></order-item>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="handle-row">
+                            <el-button type="danger">清空回收站</el-button>
+                        </div>
+                    </template>
+                </el-tab-pane>
+                <el-tab-pane :label="`搜索${searchCount}`" name="sixth">
+                    <template v-if="message === 'sixth'">
+                        <el-input v-model="input" placeholder="请输入内容" @input="inputSearch"></el-input>
+                        <el-table :data="search" :show-header="false" style="width: 100%" v-loading="loading">
+                            <el-table-column>
+                                <template slot-scope="scope">
+                                    <order-item :scope="scope"></order-item>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -71,58 +105,129 @@
 </template>
 
 <script>
-    export default {
-        name: 'tabs',
-        data() {
-            return {
-                message: 'first',
-                showHeader: false,
-                unread: [{
-                    date: '2018-04-19 20:00:00',
-                    title: '【系统通知】该系统将于今晚凌晨2点到5点进行升级维护',
-                },{
-                    date: '2018-04-19 21:00:00',
-                    title: '今晚12点整发大红包，先到先得',
-                }],
-                read: [{
-                    date: '2018-04-19 20:00:00',
-                    title: '【系统通知】该系统将于今晚凌晨2点到5点进行升级维护'
-                }],
-                recycle: [{
-                    date: '2018-04-19 20:00:00',
-                    title: '【系统通知】该系统将于今晚凌晨2点到5点进行升级维护'
-                }]
-            }
+import OrderItem from './OrderItem';
+export default {
+    name: 'tabs',
+    components: {
+        OrderItem
+    },
+    data() {
+        return {
+            message: 'first',
+            input: '',
+            loading: false,
+            search: [],
+            orders: [
+                {
+                    orderId: '20191005170626623520',
+                    createTime: new Date().toLocaleString(),
+                    count: 5,
+                    state: 1,
+                    good: {
+                        goodId: '1541',
+                        name: 'KFC超级豪华套餐1',
+                        price: 150.0,
+                        pic:
+                            'https://images.unsplash.com/photo-1585071863849-9c95194bc0d8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'
+                    },
+                    user: {
+                        name: 'HHH',
+                        phone: '145644644',
+                        avatar: 'https://assets.hhh233.xyz/001%20%284%29.jpg'
+                    },
+                    location: {
+                        lpName: 'KKKK',
+                        lpPhone: '45454545',
+                        lpLoc: '测试地址测试地址测试地址测试地址测试地址测试地址'
+                    }
+                },
+                {
+                    orderId: '20191005170626623520',
+                    createTime: new Date().toLocaleString(),
+                    count: 5,
+                    state: 2,
+                    good: {
+                        goodId: '1541',
+                        name: 'KFC超级豪华套餐2',
+                        price: 150.0
+                    },
+                    user: {
+                        name: 'HHH',
+                        phone: '145644644',
+                        avatar: ''
+                    },
+                    location: {
+                        lpName: 'KKKK',
+                        lpPhone: '45454545',
+                        lpLoc: '测试地址测试地址测试地址测试地址测试地址测试地址'
+                    }
+                },
+                {
+                    orderId: '20191005170626623520',
+                    createTime: new Date().toLocaleString(),
+                    count: 5,
+                    state: 3,
+                    good: {
+                        goodId: '1541',
+                        name: 'KFC超级豪华套餐3',
+                        price: 150.0
+                    },
+                    user: {
+                        name: 'HHH',
+                        phone: '145644644',
+                        avatar: ''
+                    },
+                    location: {
+                        lpName: 'KKKK',
+                        lpPhone: '45454545',
+                        lpLoc: '测试地址测试地址测试地址测试地址测试地址测试地址'
+                    }
+                }
+            ]
+        };
+    },
+    methods: {
+        inputSearch() {
+            this.loading = true
+            setTimeout(() => {
+                this.loading = false
+                    this.search = this.orders
+            }, 3000 * Math.random())
+        }
+    },
+    computed: {
+        searchCount() {
+            return this.search.length === 0 ? "" : "(" + this.search.length + ")"
         },
-        methods: {
-            handleRead(index) {
-                const item = this.unread.splice(index, 1);
-                console.log(item);
-                this.read = item.concat(this.read);
-            },
-            handleDel(index) {
-                const item = this.read.splice(index, 1);
-                this.recycle = item.concat(this.recycle);
-            },
-            handleRestore(index) {
-                const item = this.recycle.splice(index, 1);
-                this.read = item.concat(this.read);
-            }
+        getOrders1() {
+            return this.orders.filter(item => {
+                return item.state === 1;
+            });
         },
-        computed: {
-            unreadNum(){
-                return this.unread.length;
-            }
+        getOrders2() {
+            return this.orders.filter(item => {
+                return item.state === 2;
+            });
+        },
+        getOrders3() {
+            return this.orders.filter(item => {
+                return item.state === 3;
+            });
+        },
+        getOrders4() {
+            return this.orders.filter(item => {
+                return item.state === 4;
+            });
         }
     }
-
+};
 </script>
 
 <style>
-.message-title{
+.message-title {
     cursor: pointer;
 }
-.handle-row{
+.handle-row {
     margin-top: 30px;
 }
 </style>
