@@ -75,8 +75,36 @@
                 </el-col>
                 <el-col :span="4">
                     <div>
-                        <el-button type="primary" size="mini" round :disabled="!showButton">确认订单</el-button>
-                        <el-button size="mini" round>取消订单</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            round
+                            :disabled="!showButton"
+                            v-if="scope.row.state === 1"
+                            @click="butyconClick"
+                        >确认订单</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            round
+                            v-if="scope.row.state === 2"
+                            @click="butyconClick"
+                        >开始配送</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            round
+                            v-if="scope.row.state === 3"
+                            @click="butyconClick"
+                        >确认送达</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            round
+                            v-if="scope.row.state === 3"
+                            @click="routeClick"
+                        >查看路线</el-button>
+                        <el-button size="mini" round v-if="scope.row.state !== 4">取消订单</el-button>
                         <el-button type="text">联系买家（feature）</el-button>
                     </div>
                 </el-col>
@@ -121,6 +149,13 @@ export default {
     methods: {
         errorHandler() {
             return true;
+        },
+        butyconClick() {
+            console.log(this.scope.row);
+            this.$emit('stateAdd', this.scope.row.orderId);
+        },
+        routeClick() {
+            this.$emit('routeClick', this.scope.row.orderId);
         }
     }
 };

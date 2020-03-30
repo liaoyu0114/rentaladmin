@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 基础表格
+                    <i class="el-icon-lx-cascades"></i> 菜品管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -15,12 +15,11 @@
                     class="handle-del mr10"
                     @click="delAllSelection"
                 >批量删除</el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.name" placeholder="菜名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                 <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
+                <el-button type="primary">新增</el-button>
+                
             </div>
             <el-table
                 :data="tableData"
@@ -32,11 +31,11 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="用户名"></el-table-column>
+                <el-table-column prop="name" label="菜品名称"></el-table-column>
                 <el-table-column label="账户余额">
                     <template slot-scope="scope">￥{{scope.row.money}}</template>
                 </el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
+                <el-table-column label="首图(查看大图)" align="center">
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
@@ -45,7 +44,7 @@
                         ></el-image>
                     </template>
                 </el-table-column>
-                <el-table-column prop="address" label="地址"></el-table-column>
+                <el-table-column prop="shop" label="店铺"></el-table-column>
                 <el-table-column label="状态" align="center">
                     <template slot-scope="scope">
                         <el-tag
@@ -54,7 +53,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="date" label="注册时间"></el-table-column>
+                <el-table-column prop="date" label="创建时间"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <el-button
@@ -90,7 +89,7 @@
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
+                    <el-input v-model="form.shop"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -108,7 +107,6 @@ export default {
     data() {
         return {
             query: {
-                address: '',
                 name: '',
                 pageIndex: 1,
                 pageSize: 10
@@ -120,7 +118,50 @@ export default {
             pageTotal: 0,
             form: {},
             idx: -1,
-            id: -1
+            id: -1,
+            data: {},
+            dataTemp: {
+                list: [
+                    {
+                        id: 1,
+                        name: '测试菜品',
+                        money: 123,
+                        shop: '测试店铺',
+                        state: '在售',
+                        date: '2019-11-1',
+                        thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
+                    },
+                    {
+                        id: 2,
+                        name: '测试菜品2',
+                        money: 456,
+                        shop: '测试店铺',
+                        state: '在售',
+                        date: '2019-10-11',
+                        thumb: 'https://lin-xin.gitee.io/images/post/node3.png'
+                    },
+                    {
+                        id: 3,
+                        name: '测试菜品',
+                        money: 789,
+                        shop: '测试店铺',
+                        state: '下架',
+                        date: '2019-11-11',
+                        thumb: 'https://lin-xin.gitee.io/images/post/parcel.png'
+                    },
+                    {
+                        id: 4,
+                        name: '测试菜品',
+                        money: 1011,
+                        shop: '测试店铺',
+                        state: '在售',
+                        date: '2019-10-20',
+                        thumb: 'https://lin-xin.gitee.io/images/post/notice.png'
+                    }
+                ],
+                pageTotal: 4
+            },
+            showCannel: false
         };
     },
     created() {
@@ -138,7 +179,15 @@ export default {
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.query, 'pageIndex', 1);
-            this.getData();
+            this.tableData = this.dataTemp.list.filter(state => {
+                console.log(state)
+              return state.name.toLowerCase().indexOf(this.query.name.toString()) === 0
+            })
+            this.showCannel = true;
+        },
+        handleCannel() {
+            this.showCannel = false;
+            this.tableData = this.dataTemp.list
         },
         // 删除操作
         handleDelete(index, row) {
@@ -163,6 +212,7 @@ export default {
             for (let i = 0; i < length; i++) {
                 str += this.multipleSelection[i].name + ' ';
             }
+            this.tableData = [];
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
         },

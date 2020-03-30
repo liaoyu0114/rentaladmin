@@ -28,7 +28,7 @@ export default new Router({
                 {
                     path: '/table',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '基础表格' }
+                    meta: { title: '菜品管理' }
                 },
                 {
                     path: '/tabs',
@@ -38,7 +38,7 @@ export default new Router({
                 {
                     path: '/form',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
-                    meta: { title: '基本表单' }
+                    meta: { title: '新增菜品' }
                 },
                 {
                     // 富文本编辑器组件
