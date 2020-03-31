@@ -32,7 +32,7 @@
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="菜品名称"></el-table-column>
-                <el-table-column label="账户余额">
+                <el-table-column label="价格">
                     <template slot-scope="scope">￥{{scope.row.money}}</template>
                 </el-table-column>
                 <el-table-column label="首图(查看大图)" align="center">
