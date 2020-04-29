@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
+import store from './store'
 import ElementUI from 'element-ui';
+import Vuex from 'vuex'
 import VueI18n from 'vue-i18n';
 import { messages } from './components/common/i18n';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
@@ -9,22 +11,41 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
+import {businessLogin} from "./api/index"
 
 Vue.config.productionTip = false;
-Vue.use(VueI18n);
+Vue.use(Vuex)
 Vue.use(ElementUI, {
     size: 'small'
 });
-const i18n = new VueI18n({
-    locale: 'zh',
-    messages
-});
+
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-    document.title = `${to.meta.title} | vue-manage-system`;
-    const role = localStorage.getItem('ms_username');
-    if (!role && to.path !== '/login') {
+    document.title = `${to.meta.title} | 外卖后台管理系统`;
+    const role = localStorage.param.username;
+    // if (!role && localStorage.param) {
+    //     let data = {
+    //         "business_phone": localStorage.param.username,
+    //         "business_password": localStorage.param.password
+    //     }
+    //     businessLogin(data).then(res => {
+    //         if(res.code === "000") {
+    //             store.commit('setUserInfo', res.business)
+    //             next()
+    //         } else {
+    //             next("/login")
+    //         }
+    //     }).catch(err => {
+    //         console.log(err)
+    //         next("/login")
+    //     })
+    // } else {
+    //     next("/login")
+    //     return
+    // }
+    console.log(!role)
+    if (role.length === 0 && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {
         // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
@@ -43,6 +64,6 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
     router,
-    i18n,
+    store,
     render: h => h(App)
 }).$mount('#app');

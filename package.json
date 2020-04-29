@@ -10,11 +10,12 @@
     "deploy": "npm run build && npm run upload"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.11.0",
     "mavon-editor": "^2.6.17",
     "ora": "^4.0.3",
+    "qs": "^6.9.3",
     "scp2": "^0.5.0",
     "vue": "^2.6.10",
     "vue-barcode": "^1.2.0",
@@ -23,7 +24,8 @@
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.3",
     "vue-schart": "^2.0.0",
-    "vuedraggable": "^2.17.0"
+    "vuedraggable": "^2.17.0",
+    "vuex": "^3.3.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",

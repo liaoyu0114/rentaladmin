@@ -28,12 +28,14 @@
 </template>
 
 <script>
+
+import {businessLogin} from "../../api/index"
 export default {
     data: function() {
         return {
             param: {
-                username: 'admin',
-                password: '123123',
+                username: '',
+                password: '',
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -45,8 +47,18 @@ export default {
         submitForm() {
             this.$refs.login.validate(valid => {
                 if (valid) {
-                    this.$message.success('登录成功');
-                    localStorage.setItem('ms_username', this.param.username);
+                    let data = {
+                        "business_phone": this.param.username,
+                        "business_password": this.param.password
+                    }
+                    businessLogin(data).then(res => {
+                        if(res.code === "000") {
+                            this.$store.commit('setUserInfo', res.business)
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                    localStorage.setItem('user', this.param);
                     this.$router.push('/');
                 } else {
                     this.$message.error('请输入账号和密码');

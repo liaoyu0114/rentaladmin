@@ -34,13 +34,10 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}}
+                        {{userInfo.business_nickname}}
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -50,6 +47,8 @@
 </template>
 <script>
 import bus from '../common/bus';
+import { mapGetters } from "vuex";
+
 export default {
     data() {
         return {
@@ -60,6 +59,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(["userInfo"]),
         username() {
             let username = localStorage.getItem('ms_username');
             return username ? username : this.name;

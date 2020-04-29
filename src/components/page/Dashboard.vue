@@ -4,10 +4,10 @@
             <el-col :span="8">
                 <el-card shadow="hover" class="mgb20" style="height:252px;">
                     <div class="user-info">
-                        <img src="../../assets/img/img.jpg" class="user-avator" alt />
+                        <img :src="userInfo.business_pic" class="user-avator" alt />
                         <div class="user-info-cont">
-                            <div class="user-info-name">{{name}}</div>
-                            <div>{{role}}</div>
+                            <div class="user-info-name">{{userInfo.business_nickname}}</div>
+                            <div>{{userInfo.contact_number}}</div>
                         </div>
                     </div>
                     <div class="user-info-list">
@@ -21,12 +21,13 @@
                 </el-card>
                 <el-card shadow="hover" style="height:252px;">
                     <div slot="header" class="clearfix">
-                        <span>语言详情</span>
-                    </div>Vue
-                    <el-progress :percentage="71.3" color="#42b983"></el-progress>JavaScript
-                    <el-progress :percentage="24.1" color="#f1e05a"></el-progress>CSS
-                    <el-progress :percentage="13.7"></el-progress>HTML
-                    <el-progress :percentage="5.9" color="#f56c6c"></el-progress>
+                        <span>店铺详情</span>
+                    </div>
+                    <el-row v-if="userInfo.isshop">
+                      <el-col :span="24">
+                          店铺名称： {{shop.shop_name}}
+                      </el-col>
+                    </el-row>
                 </el-card>
             </el-col>
             <el-col :span="16">
@@ -112,12 +113,15 @@
 <script>
 import Schart from 'vue-schart';
 import bus from '../common/bus';
+import { mapGetters } from "vuex"
+import { selectshopforbusiness } from "../../api/index"
 export default {
     name: 'dashboard',
     data() {
         return {
             name: localStorage.getItem('ms_username'),
             date: new Date().toLocaleDateString(),
+            shop: {},
             todoList: [
                 {
                     title: '东西没了要下架',
@@ -219,14 +223,22 @@ export default {
         Schart
     },
     computed: {
+        ...mapGetters(["userInfo"]),
         role() {
             return this.name === 'admin' ? '超级管理员' : '普通用户';
         }
     },
-    // created() {
-    //     this.handleListener();
-    //     this.changeDate();
-    // },
+    created() {
+        selectshopforbusiness({"business_id": this.userInfo.business_id}).then(res => {
+            if(res.code === "000") {
+                this.shop = res.isShop
+            } else {
+                this.$message("出现了未知错误")
+            }
+        }).catch(() => {
+            this.$message("网络错误")
+        })
+    },
     // activated() {
     //     this.handleListener();
     // },
