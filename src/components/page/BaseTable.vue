@@ -17,12 +17,11 @@
                 >批量删除</el-button>
                 <el-input v-model="query.name" placeholder="菜名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                 <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
-                <el-button type="primary">新增</el-button>
-                
+                <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
+                <el-button type="primary" @click="newVisible = true">新增</el-button>
             </div>
             <el-table
-                :data="tableData"
+                :data="showData"
                 border
                 class="table"
                 ref="multipleTable"
@@ -30,30 +29,33 @@
                 @selection-change="handleSelectionChange"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="菜品名称"></el-table-column>
+                <el-table-column prop="dishes_id" label="ID" width="55" align="center"></el-table-column>
+                <el-table-column prop="dishname" label="菜品名称"></el-table-column>
                 <el-table-column label="价格">
-                    <template slot-scope="scope">￥{{scope.row.money}}</template>
+                    <template slot-scope="scope">￥{{scope.row.dishes_price}}</template>
                 </el-table-column>
                 <el-table-column label="首图(查看大图)" align="center">
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
-                            :src="scope.row.thumb"
-                            :preview-src-list="[scope.row.thumb]"
+                            fit="cover"
+                            :src="scope.row.dishes_pic"
+                            :preview-src-list="[scope.row.dishes_pic]"
                         ></el-image>
                     </template>
                 </el-table-column>
                 <el-table-column prop="shop" label="店铺"></el-table-column>
-                <el-table-column label="状态" align="center">
+                <el-table-column label="销量" align="center">
                     <template slot-scope="scope">
-                        <el-tag
-                            :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}</el-tag>
+                        <el-tag type="warning">{{scope.row.sales_volume}}</el-tag>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="date" label="创建时间"></el-table-column>
+                <el-table-column prop="date" label="评分">
+                    <template slot-scope="scope">
+                        <el-rate v-model="scope.row.score" disabled show-score text-color="#ff9900"></el-rate>
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <el-button
@@ -83,13 +85,67 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="50%">
             <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
+                <el-form-item label="菜品ID">
+                    <el-input v-model="form.dishes_id" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.shop"></el-input>
+                <el-form-item label="菜品名称">
+                    <el-input v-model="form.dishname" placeholder="输入菜名"></el-input>
+                </el-form-item>
+                <el-form-item label="价格">
+                    <el-input v-model="form.dishes_price" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="图片">
+                    <el-image :src="form.dishes_pic" style="width: 30%"></el-image>
+                    <el-upload
+                        class="upload-demo"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        :on-preview="handlePreview"
+                        :on-remove="handleRemove"
+                        :before-remove="beforeRemove"
+                        :limit="1"
+                        :on-exceed="handleExceed"
+                        :file-list="fileList"
+                    >
+                        <el-button size="small" type="primary">点击上传</el-button>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="原材料">
+                    <el-input v-model="form.material"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="新增菜品" :visible.sync="newVisible" width="50%">
+             <el-form ref="newForm" :model="newForm" label-width="70px">
+                <el-form-item label="菜品名称">
+                    <el-input v-model="newForm.dishname" placeholder="输入菜名"></el-input>
+                </el-form-item>
+                <el-form-item label="价格">
+                    <el-input v-model="newForm.dishes_price" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="图片">
+                    <el-image :src="newForm.dishes_pic" style="width: 30%"></el-image>
+                    <el-upload
+                        class="upload-demo"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        :on-preview="handlePreview"
+                        :on-remove="handleRemove"
+                        :before-remove="beforeRemove"
+                        :limit="1"
+                        :on-exceed="handleExceed"
+                        :file-list="fileList"
+                    >
+                        <el-button size="small" type="primary">点击上传</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="原材料">
+                    <el-input v-model="newForm.material"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -101,16 +157,25 @@
 </template>
 
 <script>
-import { fetchData } from '../../api/index';
+import { selectDishesList, selectshopforbusiness } from '../../api/index';
+import { mapGetters } from 'vuex';
 export default {
     name: 'basetable',
     data() {
         return {
+            newVisible: false,
+            newForm: {
+                dishname: "",
+                dishes_pic: "",
+                dishes_price: 0,
+                material: ""
+            },
             query: {
                 name: '',
                 pageIndex: 1,
                 pageSize: 10
             },
+            showData: [],
             tableData: [],
             multipleSelection: [],
             delList: [],
@@ -161,33 +226,61 @@ export default {
                 ],
                 pageTotal: 4
             },
-            showCannel: false
+            showCannel: false,
+            shop: {},
+            dialogImageUrl: '',
+            dialogVisible: false
         };
     },
     created() {
-        this.getData();
+        if (this.userInfo.isshop === 0) {
+            this.getData();
+        }
     },
     methods: {
+         handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleExceed(files, fileList) {
+        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      },
+      beforeRemove(file, fileList) {
+        return this.$confirm(`确定移除 ${ file.name }？`);
+      },
         // 获取 easy-mock 的模拟数据
         getData() {
-            fetchData(this.query).then(res => {
-                console.log(res);
-                this.tableData = res.list;
-                this.pageTotal = res.pageTotal || 50;
+            selectshopforbusiness({ business_id: this.userInfo.business_id }).then(res => {
+                if (res.code === '000') {
+                    this.shop = res.isShop;
+                    selectDishesList({ shop_id: this.shop.shop_id }).then(res => {
+                        console.log(res);
+                        this.tableData = res.disheslist.map(item => {
+                            item.dishes_pic = 'https://assets.hhh233.xyz/dishesvictoria-shes-Qa29U4Crvn4-unsplash.jpg';
+                            item.shop = this.shop.shop_name;
+                            return item;
+                        });
+                        this.showData = this.tableData.slice(0, 10);
+
+                        this.pageTotal = res.disheslist.length;
+                    });
+                }
             });
         },
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.query, 'pageIndex', 1);
-            this.tableData = this.dataTemp.list.filter(state => {
-                console.log(state)
-              return state.name.toLowerCase().indexOf(this.query.name.toString()) === 0
-            })
+            this.showData = this.tableData.filter(state => {
+                console.log(state);
+                return state.dishname.toLowerCase().indexOf(this.query.name.toString()) === 0;
+            });
             this.showCannel = true;
         },
         handleCannel() {
             this.showCannel = false;
-            this.tableData = this.dataTemp.list
+            this.showData = this.tableData.slice(0, 10);
         },
         // 删除操作
         handleDelete(index, row) {
@@ -210,7 +303,7 @@ export default {
             let str = '';
             this.delList = this.delList.concat(this.multipleSelection);
             for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].name + ' ';
+                str += this.multipleSelection[i].dishname + ' ';
             }
             this.tableData = [];
             this.$message.error(`删除了${str}`);
@@ -230,12 +323,33 @@ export default {
         },
         // 分页导航
         handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
-            this.getData();
+            console.log(val);
+            let count = 0;
+            let min = 10 * (val - 1);
+            let max = 10 * (val - 1) + 10;
+            if (max > this.tableData.length + 1) {
+                count = this.tableData.length + 1 - min;
+            }
+
+            this.showData = this.tableData.slice(min, max);
+            // this.getData();
         }
+    },
+    computed: {
+        ...mapGetters(['userInfo'])
     }
 };
 </script>
+<style>
+.el-upload--text {
+    width: auto;
+    height: auto;
+    border: none
+}
+.el-upload__tip {
+    margin: 0;
+}
+</style>
 
 <style scoped>
 .handle-box {

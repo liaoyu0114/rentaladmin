@@ -28,19 +28,18 @@
 </template>
 
 <script>
-
-import {businessLogin} from "../../api/index"
+import { businessLogin } from '../../api/index';
 export default {
     data: function() {
         return {
             param: {
-                username: '',
-                password: '',
+                username: '18382389886',
+                password: '123460'
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-                password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-            },
+                password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+            }
         };
     },
     methods: {
@@ -48,26 +47,32 @@ export default {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     let data = {
-                        "business_phone": this.param.username,
-                        "business_password": this.param.password
-                    }
-                    businessLogin(data).then(res => {
-                        if(res.code === "000") {
-                            this.$store.commit('setUserInfo', res.business)
-                        }
-                    }).catch(err => {
-                        console.log(err)
-                    })
-                    localStorage.setItem('user', this.param);
-                    this.$router.push('/');
+                        business_phone: this.param.username,
+                        business_password: this.param.password
+                    };
+                    businessLogin(data)
+                        .then(res => {
+                            if (res.code === '000') {
+                                res.business.business_pic = "https://assets.hhh233.xyz/defalu-business.png"
+                                this.$store.commit('setUserInfo', res.business);
+                                localStorage.setItem('userId', res.business.business_id);
+                                                        this.$router.push('/')
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+
+                    // localStorage.setItem('user', this.param);
+                    // this.$router.push('/');
                 } else {
                     this.$message.error('请输入账号和密码');
                     console.log('error submit!!');
                     return false;
                 }
             });
-        },
-    },
+        }
+    }
 };
 </script>
 

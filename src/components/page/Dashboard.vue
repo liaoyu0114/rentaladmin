@@ -2,7 +2,11 @@
     <div>
         <el-row :gutter="20">
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb20" style="height:252px;">
+                <el-card shadow="hover" class="mgb20">
+                    <div slot="header" class="clearfix">
+                        <span>商户详情</span>
+                        <el-button type="text" v-if="userInfo.isshop === 0" style="float: right; padding: 3px 0">修改信息</el-button>
+                    </div>
                     <div class="user-info">
                         <img :src="userInfo.business_pic" class="user-avator" alt />
                         <div class="user-info-cont">
@@ -22,10 +26,18 @@
                 <el-card shadow="hover" style="height:252px;">
                     <div slot="header" class="clearfix">
                         <span>店铺详情</span>
+                        <el-button type="text" v-if="userInfo.isshop === 0" style="float: right; padding: 3px 0">修改信息</el-button>
                     </div>
-                    <el-row v-if="userInfo.isshop">
+                    <el-row v-if="this.userInfo.isshop === 0">
+                        <el-col :span="4"><el-image :src="shop.shop_pic"></el-image> </el-col>
+                        <el-col :span="20">{{shop.shop_name}}</el-col>
+                        <el-col :span="24">地址： {{shop.shop_address}}</el-col>
+                        <el-col :span="24">公告： {{shop.shop_notice}}</el-col>
+                    </el-row>
+                    <el-row v-else>
                       <el-col :span="24">
-                          店铺名称： {{shop.shop_name}}
+                          还没有店铺哦，你可以申请一个👇<br>
+                          <el-button type="primary">申请店铺</el-button>
                       </el-col>
                     </el-row>
                 </el-card>
@@ -37,7 +49,8 @@
                             <div class="grid-content grid-con-1">
                                 <i class="el-icon-lx-people grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">1234</div>
+                                     <div class="grid-num" v-if="userInfo.isshop === 0">1234</div>
+                                     <div class="grid-num" v-else>暂无数据</div>
                                     <div>用户访问量</div>
                                 </div>
                             </div>
@@ -48,7 +61,8 @@
                             <div class="grid-content grid-con-2">
                                 <i class="el-icon-lx-notice grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">321</div>
+                                    <div class="grid-num" v-if="userInfo.isshop === 0">321</div>
+                                    <div class="grid-num" v-else>暂无数据</div>
                                     <div>系统消息</div>
                                 </div>
                             </div>
@@ -59,7 +73,8 @@
                             <div class="grid-content grid-con-3">
                                 <i class="el-icon-lx-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">5000</div>
+                                    <div class="grid-num" v-if="userInfo.isshop === 0">{{shop.shop_sales}}</div>
+                                    <div class="grid-num" v-else>暂无数据</div>
                                     <div>销量</div>
                                 </div>
                             </div>
@@ -113,8 +128,8 @@
 <script>
 import Schart from 'vue-schart';
 import bus from '../common/bus';
-import { mapGetters } from "vuex"
-import { selectshopforbusiness } from "../../api/index"
+import { mapGetters } from 'vuex';
+import { selectshopforbusiness } from '../../api/index';
 export default {
     name: 'dashboard',
     data() {
@@ -223,21 +238,25 @@ export default {
         Schart
     },
     computed: {
-        ...mapGetters(["userInfo"]),
+        ...mapGetters(['userInfo']),
         role() {
             return this.name === 'admin' ? '超级管理员' : '普通用户';
         }
     },
     created() {
-        selectshopforbusiness({"business_id": this.userInfo.business_id}).then(res => {
-            if(res.code === "000") {
-                this.shop = res.isShop
-            } else {
-                this.$message("出现了未知错误")
-            }
-        }).catch(() => {
-            this.$message("网络错误")
-        })
+        if (this.userInfo.isshop === 0) {
+            selectshopforbusiness({ business_id: this.userInfo.business_id })
+                .then(res => {
+                    if (res.code === '000') {
+                        this.shop = res.isShop;
+                    } else {
+                        this.$message('出现了未知错误');
+                    }
+                })
+                .catch(() => {
+                    this.$message('网络错误');
+                });
+        }
     },
     // activated() {
     //     this.handleListener();
