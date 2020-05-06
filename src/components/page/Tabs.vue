@@ -121,6 +121,7 @@
 <script>
 import OrderItem from './OrderItem';
 import GdMap from './GdMap';
+import { mapGetters } from "vuex"
 export default {
     name: 'tabs',
     components: {
@@ -224,6 +225,9 @@ export default {
             ]
         };
     },
+    created() {
+        
+    },
     methods: {
         inputSearch() {
             this.loading = true;
@@ -244,6 +248,7 @@ export default {
         }
     },
     computed: {
+        ...mapGetters(["userInfo"]),
         searchCount() {
             return this.search.length === 0 ? '' : '(' + this.search.length + ')';
         },

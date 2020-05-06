@@ -29,7 +29,7 @@
                         </el-col>
                     </el-form-item>
                     <el-form-item label="菜品价格">
-                        <el-input type="number" v-model="form.price"></el-input>
+                        <el-input type="number" v-model="form.price" min="0"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit">表单提交</el-button>
