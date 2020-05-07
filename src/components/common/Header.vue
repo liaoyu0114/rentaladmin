@@ -5,15 +5,9 @@
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">在线点餐后台管理系统</div>
+        <div class="logo">房屋租赁后台管理</div>
         <div class="header-right">
             <div class="header-user-con">
-                <!-- 全屏显示 -->
-                <div class="btn-fullscreen" @click="handleFullScreen">
-                    <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
-                        <i class="el-icon-rank"></i>
-                    </el-tooltip>
-                </div>
                 <!-- 消息中心 -->
                 <div class="btn-bell">
                     <el-tooltip

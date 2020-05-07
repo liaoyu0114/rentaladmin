@@ -1,27 +1,27 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">后台管理系统</div>
+            <div class="ms-title">房屋租赁后台管理</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username">
-                        <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
+                    <el-input v-model="param.username" placeholder="请输入账号">
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input
                         type="password"
-                        placeholder="password"
+                        placeholder="请输入密码"
                         v-model="param.password"
                         @keyup.enter.native="submitForm()"
                     >
-                        <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm()">登录</el-button>
+                    <el-button type="primary" @click="submitForm()" style="font-size: 18px; letter-spacing: 5px">登录</el-button>
                 </div>
-                <p class="login-tips">Tips : 用户名和密码随便填。</p>
+                <div class="login-btn">
+                    <el-button type="text" class="reg-btn">注册</el-button>
+                </div>
             </el-form>
         </div>
     </div>
@@ -53,18 +53,15 @@ export default {
                     businessLogin(data)
                         .then(res => {
                             if (res.code === '000') {
-                                res.business.business_pic = "https://assets.hhh233.xyz/defalu-business.png"
+                                res.business.business_pic = 'https://assets.hhh233.xyz/defalu-business.png';
                                 this.$store.commit('setUserInfo', res.business);
                                 localStorage.setItem('userId', res.business.business_id);
-                                                        this.$router.push('/')
+                                this.$router.push('/');
                             }
                         })
                         .catch(err => {
                             console.log(err);
                         });
-
-                    // localStorage.setItem('user', this.param);
-                    // this.$router.push('/');
                 } else {
                     this.$message.error('请输入账号和密码');
                     console.log('error submit!!');
@@ -89,8 +86,16 @@ export default {
     line-height: 50px;
     text-align: center;
     font-size: 20px;
-    color: #fff;
+    color: #888;
     border-bottom: 1px solid #ddd;
+}
+.reg-btn {
+    color: white;
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+.reg-btn:hover {
+ text-decoration: underline;
 }
 .ms-login {
     position: absolute;

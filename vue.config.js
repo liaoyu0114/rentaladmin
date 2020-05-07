@@ -22,7 +22,7 @@ module.exports = {
             // extensions: {},
             //配置文件别名
             alias: {
-              'api': './api',
+              'api': '/api',
               'common': '/common',
               'components': '/components',
               'network': '/network',

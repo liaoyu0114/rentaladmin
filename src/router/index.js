@@ -21,24 +21,19 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
                 {
-                    path: '/icon',
-                    component: () => import(/* webpackChunkName: "icon" */ '../components/page/Icon.vue'),
-                    meta: { title: '自定义图标' }
-                },
-                {
-                    path: '/table',
+                    path: '/myhouse',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '菜品管理' }
+                    meta: { title: '我的房源' }
                 },
                 {
-                    path: '/tabs',
+                    path: '/money',
                     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: '订单管理' }
+                    meta: { title: '收租金' }
                 },
                 {
-                    path: '/form',
+                    path: '/error',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
-                    meta: { title: '新增菜品' }
+                    meta: { title: '处理报障' }
                 },
                 {
                     // 富文本编辑器组件

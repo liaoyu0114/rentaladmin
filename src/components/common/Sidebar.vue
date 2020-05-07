@@ -63,18 +63,18 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: 'table',
-                    title: '菜品管理'
+                    index: 'myhouse',
+                    title: '我的房源'
                 },
                 {
                     icon: 'el-icon-lx-copy',
-                    index: 'tabs',
-                    title: '订单管理'
+                    index: 'money',
+                    title: '收租金'
                 },
                 {
                     icon: 'el-icon-lx-calendar',
-                    index: 'form',
-                    title: '新增菜品',
+                    index: 'error',
+                    title: '处理报障',
                 },
                 // {
                 //     icon: 'el-icon-lx-emoji',
