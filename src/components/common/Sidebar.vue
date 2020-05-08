@@ -64,68 +64,38 @@ export default {
                 {
                     icon: 'el-icon-lx-cascades',
                     index: 'myhouse',
-                    title: '我的房源'
+                    title: '房源管理'
                 },
                 {
                     icon: 'el-icon-lx-copy',
-                    index: 'money',
-                    title: '收租金'
+                    index: 'rental',
+                    title: '租赁管理'
                 },
                 {
                     icon: 'el-icon-lx-calendar',
-                    index: 'error',
-                    title: '处理报障',
+                    index: 'showhouse',
+                    title: '看房管理',
                 },
-                // {
-                //     icon: 'el-icon-lx-emoji',
-                //     index: 'icon',
-                //     title: '自定义图标'
-                // },
-                // {
-                //     icon: 'el-icon-pie-chart',
-                //     index: 'charts',
-                //     title: 'schart图表'
-                // },
-                // {
-                //     icon: 'el-icon-rank',
-                //     index: '6',
-                //     title: '拖拽组件',
-                //     subs: [
-                //         {
-                //             index: 'drag',
-                //             title: '拖拽列表'
-                //         },
-                //         {
-                //             index: 'dialog',
-                //             title: '拖拽弹框'
-                //         }
-                //     ]
-                // },
-                // {
-                //     icon: 'el-icon-lx-global',
-                //     index: 'i18n',
-                //     title: '国际化功能'
-                // },
-                // {
-                //     icon: 'el-icon-lx-warn',
-                //     index: '7',
-                //     title: '错误处理',
-                //     subs: [
-                //         {
-                //             index: 'permission',
-                //             title: '权限测试'
-                //         },
-                //         {
-                //             index: '404',
-                //             title: '404页面'
-                //         }
-                //     ]
-                // },
-                // {
-                //     icon: 'el-icon-lx-redpacket_fill',
-                //     index: '/donate',
-                //     title: '支持作者'
-                // }
+                {
+                    icon: 'el-icon-lx-emoji',
+                    index: 'delhouse',
+                    title: '退房管理'
+                },
+                {
+                    icon: 'el-icon-pie-chart',
+                    index: 'error',
+                    title: '报障管理'
+                },
+                {
+                    icon: 'el-icon-rank',
+                    index: 'money',
+                    title: '租金管理'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'paper',
+                    title: '合同管理'
+                }
             ]
         };
     },
