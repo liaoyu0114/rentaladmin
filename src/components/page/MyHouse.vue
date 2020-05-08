@@ -9,12 +9,6 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-button
-                    type="primary"
-                    icon="el-icon-delete"
-                    class="handle-del mr10"
-                    @click="delAllSelection"
-                >批量删除</el-button>
                 <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
@@ -26,52 +20,50 @@
                 class="table"
                 ref="multipleTable"
                 header-cell-class-name="table-header"
-                @selection-change="handleSelectionChange"
             >
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="dishes_id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="dishname" label="房源名称"></el-table-column>
+                <el-table-column prop="housingresources_id" label="房源ID" width="70" align="center"></el-table-column>
+                <el-table-column prop="housingresources_name" label="房源名称"></el-table-column>
                 <el-table-column label="租金">
-                    <template slot-scope="scope">￥{{scope.row.dishes_price}}</template>
+                    <template slot-scope="scope">￥{{scope.row.housingresources_price}}</template>
                 </el-table-column>
-                <el-table-column label="首图(查看大图)" align="center">
+                <el-table-column label="图片" align="center">
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
                             fit="cover"
-                            :src="scope.row.dishes_pic"
-                            :preview-src-list="[scope.row.dishes_pic]"
+                            :src="scope.row.housingresources_pic[0]"
+                            :preview-src-list="scope.row.housingresources_pic"
                         ></el-image>
                     </template>
                 </el-table-column>
-                <el-table-column prop="shop" label="地址"></el-table-column>
-                <el-table-column label="销量" align="center">
+                <el-table-column prop="housingresources_address" label="地址"></el-table-column>
+                <el-table-column label="用户" align="center">
                     <template slot-scope="scope">
-                        <el-tag type="warning">{{scope.row.sales_volume}}</el-tag>
-                    </template>
-                </el-table-column>
-
-                <el-table-column prop="date" label="评分">
-                    <template slot-scope="scope">
-                        <el-rate v-model="scope.row.score" disabled show-score text-color="#ff9900"></el-rate>
+                        <el-popover
+                                placement="top-start"
+                                trigger="hover">
+                            <el-row :gutter="10">
+                                <el-col>这里放租客信息</el-col>
+                            </el-row>
+                            <el-avatar :src="scope.row.housingresources_pic[1]" slot="reference"></el-avatar>
+                        </el-popover>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <el-button
-                            type="text"
-                            icon="el-icon-edit"
-                            @click="handleEdit(scope.$index, scope.row)"
+                            size="mini"
+                            @click.prevent="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
                         <el-button
-                            type="text"
-                            icon="el-icon-delete"
-                            class="red"
-                            @click="handleDelete(scope.$index, scope.row)"
+                            size="mini"
+                            type="danger"
+                            @click.prevent="handleDelete(scope.$index, scope.row)"
                         >删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
+            <!--这里是分页-->
             <div class="pagination">
                 <el-pagination
                     background
@@ -124,7 +116,7 @@
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="新增菜品" :visible.sync="newVisible" width="50%">
+        <el-dialog title="发布新房源" :visible.sync="newVisible" width="50%">
             <el-form ref="newForm" :model="newForm" label-width="70px">
                 <el-form-item label="房源名称">
                     <el-input v-model="form.name" placeholder="输入房源名称"></el-input>
@@ -148,7 +140,7 @@
                         <el-option label="其他" value="其他"></el-option>
                     </el-select>
                 </el-form-item>
-                
+
                 <el-form-item label="楼层">
                    <el-select v-model="form.floor" placeholder="选择出租类型">
                         <el-option label="高层" value="高层"></el-option>
@@ -195,7 +187,6 @@
 </template>
 
 <script>
-import { selectDishesList, selectshopforbusiness } from '../../api/index';
 import { mapGetters } from 'vuex';
 export default {
     name: 'basetable',
@@ -231,47 +222,6 @@ export default {
             idx: -1,
             id: -1,
             data: {},
-            dataTemp: {
-                list: [
-                    {
-                        id: 1,
-                        name: '测试菜品',
-                        money: 123,
-                        shop: '测试店铺',
-                        state: '在售',
-                        date: '2019-11-1',
-                        thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
-                    },
-                    {
-                        id: 2,
-                        name: '测试菜品2',
-                        money: 456,
-                        shop: '测试店铺',
-                        state: '在售',
-                        date: '2019-10-11',
-                        thumb: 'https://lin-xin.gitee.io/images/post/node3.png'
-                    },
-                    {
-                        id: 3,
-                        name: '测试菜品',
-                        money: 789,
-                        shop: '测试店铺',
-                        state: '下架',
-                        date: '2019-11-11',
-                        thumb: 'https://lin-xin.gitee.io/images/post/parcel.png'
-                    },
-                    {
-                        id: 4,
-                        name: '测试菜品',
-                        money: 1011,
-                        shop: '测试店铺',
-                        state: '在售',
-                        date: '2019-10-20',
-                        thumb: 'https://lin-xin.gitee.io/images/post/notice.png'
-                    }
-                ],
-                pageTotal: 4
-            },
             showCannel: false,
             shop: {},
             dialogImageUrl: '',
@@ -279,11 +229,23 @@ export default {
         };
     },
     created() {
-        if (this.userInfo.isshop === 0) {
-            this.getData();
-        }
+        this.showData.push( {
+            housingresources_id: "1827",
+            housingresources_name: "测试测试测试测试测试测试测试测试测试",
+            housingresources_price: 920,
+            housingresources_address: "地址地址地址地址地址地址地址地址地址",
+            housingresources_pic: [
+                "https://assets.hhh233.xyz/181.jpg",
+                "https://assets.hhh233.xyz/045%20%282%29.jpg",
+                "https://assets.hhh233.xyz/05-8.jpg"
+            ]
+        })
     },
     methods: {
+        tableRowClick(row, column, event) {
+            console.log(row);
+            this.$message("233")
+        },
         handleRemove(file, fileList) {
             console.log(file, fileList);
         },
@@ -297,25 +259,6 @@ export default {
         },
         beforeRemove(file, fileList) {
             return this.$confirm(`确定移除 ${file.name}？`);
-        },
-        // 获取 easy-mock 的模拟数据
-        getData() {
-            selectshopforbusiness({ business_id: this.userInfo.business_id }).then(res => {
-                if (res.code === '000') {
-                    this.shop = res.isShop;
-                    selectDishesList({ shop_id: this.shop.shop_id }).then(res => {
-                        console.log(res);
-                        this.tableData = res.disheslist.map(item => {
-                            item.dishes_pic = 'https://assets.hhh233.xyz/dishesvictoria-shes-Qa29U4Crvn4-unsplash.jpg';
-                            item.shop = this.shop.shop_name;
-                            return item;
-                        });
-                        this.showData = this.tableData.slice(0, 10);
-
-                        this.pageTotal = res.disheslist.length;
-                    });
-                }
-            });
         },
         // 触发搜索按钮
         handleSearch() {
@@ -342,21 +285,6 @@ export default {
                 })
                 .catch(() => {});
         },
-        // 多选操作
-        handleSelectionChange(val) {
-            this.multipleSelection = val;
-        },
-        delAllSelection() {
-            const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].dishname + ' ';
-            }
-            this.tableData = [];
-            this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
-        },
         // 编辑操作
         handleEdit(index, row) {
             this.idx = index;
@@ -380,7 +308,6 @@ export default {
             }
 
             this.showData = this.tableData.slice(min, max);
-            // this.getData();
         }
     },
     computed: {

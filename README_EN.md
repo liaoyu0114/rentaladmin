@@ -142,7 +142,7 @@ The first step to remove the component of the routing. Enter 'src/router/index.j
 ```JavaScript
 {
     path: '/editor',
-    component: resolve => require(['../components/page/VueEditor.vue'], resolve)
+    component: resolve => require([DelHouse.vue], resolve)
 },
 ```
 

@@ -3,13 +3,13 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-copy"></i> 租金管理
+                    <i class="el-icon-lx-copy"></i> 租赁管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
             <el-tabs v-model="message">
-                <el-tab-pane :label="`所有订单(${orders.length})`" name="first">
+                <el-tab-pane :label="`所有(${orders.length})`" name="first">
                     <el-table :data="orders" :show-header="false" style="width: 100%">
                         <el-table-column>
                             <template slot-scope="scope">
@@ -27,13 +27,13 @@
                             </template>
                         </el-table-column>-->
                     </el-table>
-                    <div class="handle-row">
-                        <el-button type="primary">全部确认</el-button>
-                        <el-button type="primary" @click="drawer = true">全部确认</el-button>
-                    </div>
+                    <!--<div class="handle-row">-->
+                        <!--<el-button type="primary">全部确认</el-button>-->
+                        <!--<el-button type="primary" @click="drawer = true">全部确认</el-button>-->
+                    <!--</div>-->
                 </el-tab-pane>
 
-                <el-tab-pane :label="`未收租金(${getOrders1.length})`" name="second">
+                <el-tab-pane :label="`申请租赁(${getOrders1.length})`" name="second">
                     <template v-if="message === 'second'">
                         <el-table :data="getOrders1" :show-header="false" style="width: 100%">
                             <el-table-column>
@@ -47,7 +47,7 @@
                         </div>
                     </template>
                 </el-tab-pane>
-                <el-tab-pane :label="`已收租金(${getOrders2.length})`" name="third">
+                <el-tab-pane :label="`已租赁(${getOrders2.length})`" name="third">
                     <template v-if="message === 'third'">
                         <el-table :data="getOrders2" :show-header="false" style="width: 100%">
                             <el-table-column>

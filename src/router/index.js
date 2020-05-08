@@ -22,37 +22,37 @@ export default new Router({
                 },
                 {
                     path: '/myhouse',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../components/page/MyHouse.vue'),
                     meta: { title: '房源管理' }
                 },
                 {
                     path: '/rental',
-                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
+                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Rental.vue'),
                     meta: { title: '租赁管理' }
                 },
                 {
                     path: '/showhouse',
-                    component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
+                    component: () => import(/* webpackChunkName: "form" */ '../components/page/ShowHouse.vue'),
                     meta: { title: '看房管理' }
                 },
                 {
                     path: '/delhouse',
-                    component: () => import(/* webpackChunkName: "editor" */ '../components/page/VueEditor.vue'),
+                    component: () => import(/* webpackChunkName: "editor" */ '../components/page/DelHouse.vue'),
                     meta: { title: '看房管理' }
                 },
                 {
                     path: '/error',
-                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Error.vue'),
                     meta: { title: '报障管理' }
                 },
                 {
                     path: '/money',
-                    component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
+                    component: () => import(/* webpackChunkName: "upload" */ '../components/page/Money.vue'),
                     meta: { title: '租金管理' }
                 },
                 {
                     path: '/paper',
-                    component: () => import(/* webpackChunkName: "chart" */ '../components/page/BaseCharts.vue'),
+                    component: () => import(/* webpackChunkName: "chart" */ '../components/page/Paper.vue'),
                     meta: { title: '合同管理' }
                 },
                 {
