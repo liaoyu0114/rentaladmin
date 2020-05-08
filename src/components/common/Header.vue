@@ -5,7 +5,7 @@
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">房屋租赁后台管理</div>
+        <div class="logo">RENTALHOUSE管理平台</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 消息中心 -->
