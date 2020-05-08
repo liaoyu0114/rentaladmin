@@ -44,7 +44,7 @@
                         ></el-image>
                     </template>
                 </el-table-column>
-                <el-table-column prop="shop" label="店铺"></el-table-column>
+                <el-table-column prop="shop" label="地址"></el-table-column>
                 <el-table-column label="销量" align="center">
                     <template slot-scope="scope">
                         <el-tag type="warning">{{scope.row.sales_volume}}</el-tag>
