@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-copy"></i> 订单管理
+                    <i class="el-icon-lx-copy"></i> 租金管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -33,7 +33,7 @@
                     </div>
                 </el-tab-pane>
 
-                <el-tab-pane :label="`未接单(${getOrders1.length})`" name="second">
+                <el-tab-pane :label="`未收租金(${getOrders1.length})`" name="second">
                     <template v-if="message === 'second'">
                         <el-table :data="getOrders1" :show-header="false" style="width: 100%">
                             <el-table-column>
@@ -47,7 +47,7 @@
                         </div>
                     </template>
                 </el-tab-pane>
-                <el-tab-pane :label="`已接单(${getOrders2.length})`" name="third">
+                <el-tab-pane :label="`已收租金(${getOrders2.length})`" name="third">
                     <template v-if="message === 'third'">
                         <el-table :data="getOrders2" :show-header="false" style="width: 100%">
                             <el-table-column>
@@ -79,7 +79,7 @@
                         </div>
                     </template>
                 </el-tab-pane>
-                <el-tab-pane :label="`已完成(${getOrders4.length})`" name="fifth">
+                <el-tab-pane :label="`房源申请(${getOrders4.length})`" name="fifth">
                     <template v-if="message === 'fifth'">
                         <el-table :data="getOrders4" :show-header="false" style="width: 100%">
                             <el-table-column>

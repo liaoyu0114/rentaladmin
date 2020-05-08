@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 菜品管理
+                    <i class="el-icon-lx-cascades"></i> 房源管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -15,10 +15,10 @@
                     class="handle-del mr10"
                     @click="delAllSelection"
                 >批量删除</el-button>
-                <el-input v-model="query.name" placeholder="菜名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
-                <el-button type="primary" @click="newVisible = true">新增</el-button>
+                <el-button type="primary" @click="newVisible = true">发布新房源</el-button>
             </div>
             <el-table
                 :data="showData"
@@ -30,8 +30,8 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="dishes_id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="dishname" label="菜品名称"></el-table-column>
-                <el-table-column label="价格">
+                <el-table-column prop="dishname" label="房源名称"></el-table-column>
+                <el-table-column label="租金">
                     <template slot-scope="scope">￥{{scope.row.dishes_price}}</template>
                 </el-table-column>
                 <el-table-column label="首图(查看大图)" align="center">
@@ -87,14 +87,18 @@
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="50%">
             <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="菜品ID">
-                    <el-input v-model="form.dishes_id" disabled></el-input>
+                <el-form-item label="房源名称">
+                    <el-input v-model="form.name" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="菜品名称">
-                    <el-input v-model="form.dishname" placeholder="输入菜名"></el-input>
+                <el-form-item label="房源地址">
+                    <el-input v-model="form.address" placeholder="搜索地址"></el-input>
                 </el-form-item>
-                <el-form-item label="价格">
-                    <el-input v-model="form.dishes_price" type="number"></el-input>
+                <el-form-item label="房型">
+                    <el-radio-group v-model="form.hType">
+                        <el-radio label="整套出租"></el-radio>
+                        <el-radio label="单间出租"></el-radio>
+                        <el-radio label="短租/日租"></el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <el-form-item label="图片">
                     <el-image :src="form.dishes_pic" style="width: 30%"></el-image>
@@ -121,29 +125,65 @@
             </span>
         </el-dialog>
         <el-dialog title="新增菜品" :visible.sync="newVisible" width="50%">
-             <el-form ref="newForm" :model="newForm" label-width="70px">
-                <el-form-item label="菜品名称">
-                    <el-input v-model="newForm.dishname" placeholder="输入菜名"></el-input>
+            <el-form ref="newForm" :model="newForm" label-width="70px">
+                <el-form-item label="房源名称">
+                    <el-input v-model="form.name" placeholder="输入房源名称"></el-input>
                 </el-form-item>
-                <el-form-item label="价格">
-                    <el-input v-model="newForm.dishes_price" type="number"></el-input>
+                <el-form-item label="房源地址">
+                    <el-input v-model="form.address" placeholder="搜索地址"></el-input>
                 </el-form-item>
-                <el-form-item label="图片">
-                    <el-image :src="newForm.dishes_pic" style="width: 30%"></el-image>
-                    <el-upload
-                        class="upload-demo"
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        :on-preview="handlePreview"
-                        :on-remove="handleRemove"
-                        :before-remove="beforeRemove"
-                        :limit="1"
-                        :on-exceed="handleExceed"
-                    >
-                        <el-button size="small" type="primary">点击上传</el-button>
-                    </el-upload>
+                <el-form-item label="出租类型">
+                    <el-select v-model="form.catalog" placeholder="选择出租类型">
+                        <el-option label="整套出租" value="整套出租"></el-option>
+                        <el-option label="单间出租" value="单间出租"></el-option>
+                        <el-option label="短租/日租" value="短租/日租"></el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="原材料">
-                    <el-input v-model="newForm.material"></el-input>
+                <el-form-item label="房型">
+                    <el-select v-model="form.hType" placeholder="选择房型">
+                        <el-option label="三室一厅" value="三室一厅"></el-option>
+                        <el-option label="三室二厅" value="三室二厅"></el-option>
+                        <el-option label="两室一厅" value="两室一厅"></el-option>
+                          <el-option label="一室一厅" value="一室一厅"></el-option>
+                        <el-option label="其他" value="其他"></el-option>
+                    </el-select>
+                </el-form-item>
+                
+                <el-form-item label="楼层">
+                   <el-select v-model="form.floor" placeholder="选择出租类型">
+                        <el-option label="高层" value="高层"></el-option>
+                        <el-option label="中层" value="中层"></el-option>
+                        <el-option label="低层" value="低层"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="朝向">
+                   <el-select v-model="form.dirction" placeholder="选择朝向">
+                        <el-option label="南" value="南"></el-option>
+                        <el-option label="东南" value="东南"></el-option>
+                        <el-option label="东" value="东"></el-option>
+                        <el-option label="东北" value="东北"></el-option>
+                        <el-option label=北 value="北"></el-option>
+                        <el-option label="西北" value="西北"></el-option>
+                        <el-option label="西" value="西"></el-option>
+                        <el-option label="西南" value="西南"></el-option>
+                    </el-select>
+                </el-form-item>
+                 <el-form-item label="押金类型">
+                   <el-select v-model="form.mType" placeholder="选择押金类型">
+                        <el-option label="押一付一" value="押一付一"></el-option>
+                        <el-option label="押一付三" value="押一付三"></el-option>
+                        <el-option label="半年付" value="半年付"></el-option>
+                        <el-option label="年" value="年"></el-option>
+                    </el-select>
+                </el-form-item>
+                 <el-form-item label="每月租金">
+                   <el-input v-model="form.price" placeholder="输入每月租金" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="房屋面积">
+                   <el-input v-model="form.rect" placeholder="输入房屋面积" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="写点描述">
+                    <el-input v-model="newForm.intraduce" type="textarea"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -163,10 +203,18 @@ export default {
         return {
             newVisible: false,
             newForm: {
-                dishname: "",
-                dishes_pic: "",
-                dishes_price: 0,
-                material: ""
+                name: '',
+                address: '',
+                catalog: '',
+                hType: '',
+                intraduce: '',
+                floor: '',
+                dirction: '',
+                mType: '',
+                price: '',
+                rect: '',
+                lat: '',
+                lng: ''
             },
             query: {
                 name: '',
@@ -236,18 +284,20 @@ export default {
         }
     },
     methods: {
-         handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePreview(file) {
-        console.log(file);
-      },
-      handleExceed(files, fileList) {
-        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-      },
-      beforeRemove(file, fileList) {
-        return this.$confirm(`确定移除 ${ file.name }？`);
-      },
+        handleRemove(file, fileList) {
+            console.log(file, fileList);
+        },
+        handlePreview(file) {
+            console.log(file);
+        },
+        handleExceed(files, fileList) {
+            this.$message.warning(
+                `当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`
+            );
+        },
+        beforeRemove(file, fileList) {
+            return this.$confirm(`确定移除 ${file.name}？`);
+        },
         // 获取 easy-mock 的模拟数据
         getData() {
             selectshopforbusiness({ business_id: this.userInfo.business_id }).then(res => {
@@ -342,7 +392,7 @@ export default {
 .el-upload--text {
     width: auto;
     height: auto;
-    border: none
+    border: none;
 }
 .el-upload__tip {
     margin: 0;
