@@ -9,7 +9,7 @@ client.scp('./dist/', {    // 本地打包文件的位置
   "port": '22',            // 服务器端口， 一般为 22
   "username": 'root',       // 用户名
   "password": 'liaoyu1997..',     // 密码
-  "path": '/www/wwwroot/frp.hhh233.xyz/admin/'            // 项目部署的服务器目标位置
+  "path": '/www/wwwroot/rental.hhh233.xyz/'            // 项目部署的服务器目标位置
 }, err =>{
   spinner.stop();
   if (!err) {
