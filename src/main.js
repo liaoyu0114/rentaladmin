@@ -9,6 +9,9 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import moment from 'moment'
+import Print from 'vue-print-nb'
+
+Vue.use(Print);
 
 Vue.config.productionTip = false;
 Vue.use(Vuex)

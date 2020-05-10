@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="paper">
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
@@ -46,12 +46,16 @@
 
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="270" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 size="mini"
                                 @click.prevent="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
+                        <el-button
+                                size="mini"
+                                @click="showPaperFunc(scope.$index, scope.row)"
+                        >查看</el-button>
                         <el-button
                                 size="mini"
                                 type="danger"
@@ -72,6 +76,9 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-dialog :visible.sync="showPaper" title="查看/打印房屋租赁合同" custom-class="paper-show">
+            <show-paper :scope="paper"></show-paper>
+        </el-dialog>
     </div>
 </template>
 
@@ -86,6 +93,7 @@ export default {
     data() {
         return {
             newVisible: false,
+            showPaper: false,
             showData: [],
             tableData: [],
             query: {
@@ -94,12 +102,13 @@ export default {
                 pageSize: 10
             },
             editForm: { },
+            paper: {},
             temp: {
                 contract_id: 2137812,
                 contract_price: 927,
                 housingresources_renttype: "年付",
                 contract_begintime: new Date().getTime(),
-                contract_endtime: new Date().getTime() + 99999
+                contract_endtime: new Date().getTime() + 9999999999999
             }
         };
     },
@@ -113,6 +122,14 @@ export default {
         this.showData = this.tableData.slice(0,10)
     },
     methods: {
+        showPaperFunc(index, row) {
+            this.showPaper = true
+            this.paper = row
+        },
+        //搜索
+        handleSearch() {
+
+        },
         // 删除操作
         handleDelete(index, row) {
             // 二次确认删除
@@ -163,4 +180,10 @@ export default {
 .mr10 {
     margin-right: 10px;
 }
+
+</style>
+<style>
+    .paper-show>.el-dialog__body {
+        padding: 0 20px !important;
+    }
 </style>
