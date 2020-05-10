@@ -8,11 +8,15 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
+import moment from 'moment'
 
 Vue.config.productionTip = false;
 Vue.use(Vuex)
 Vue.use(ElementUI, {
     size: 'small'
+});
+Vue.filter('formatDate', function (input, fmtstring) {
+    return moment(Number(input)).format(fmtstring)
 });
 
 

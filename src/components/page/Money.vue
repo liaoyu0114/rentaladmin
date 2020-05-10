@@ -2,140 +2,197 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 表单</el-breadcrumb-item>
-                <el-breadcrumb-item>图片上传</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-money"></i> 租金管理</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="content-title">支持拖拽</div>
-            <div class="plugins-tips">
-                Element UI自带上传组件。
-                访问地址：<a href="http://element.eleme.io/Money.vue#/zh-CN/component/upload" target="_blank">Element UI Upload</a>
+            <div class="handle-box">
+
+                <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button type="primary">新增</el-button>
+                <el-tabs v-model="message" @tab-click="handleClick">
+                    <el-tab-pane label="全部" name="first"></el-tab-pane>
+                    <el-tab-pane label="未缴纳" name="second"></el-tab-pane>
+                    <el-tab-pane label="已缴纳" name="third"></el-tab-pane>
+                </el-tabs>
             </div>
-            <el-upload
-                class="upload-demo"
-                drag
-                action="http://jsonplaceholder.typicode.com/api/posts/"
-                multiple>
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-            </el-upload>
-            <div class="content-title">支持裁剪</div>
-            <div class="plugins-tips">
-                vue-cropperjs：一个封装了 cropperjs 的 Vue 组件。
-                访问地址：<a href="https://github.com/Agontuk/vue-cropperjs" target="_blank">vue-cropperjs</a>
+            <el-table
+                    :data="showData"
+                    border
+                    class="table"
+                    ref="multipleTable"
+                    header-cell-class-name="table-header"
+            >
+                <el-table-column prop="rent_id" label="租金ID" width="70" align="center"></el-table-column>
+                <el-table-column  label="租客昵称" align="center">
+                    <template slot-scope="scope">{{scope.row.landlord.landlord_nickname}}</template>
+                </el-table-column>
+                <el-table-column label="应交租金" align="center">
+                    <template slot-scope="scope">￥{{scope.row.rent_price}}</template>
+                </el-table-column>
+                <el-table-column  label="创建时间" align="center">
+                    <template slot-scope="scope">{{scope.row.rent_time | formatDate("YYYY-MM-DD HH:mm")}}</template>
+                </el-table-column>
+                <el-table-column  label="截止时间" align="center">
+                    <template slot-scope="scope">{{scope.row.rent_endtime | formatDate("YYYY-MM-DD HH:mm")}}</template>
+                </el-table-column>
+                <el-table-column label="缴纳状态" align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.rent_type === 1" style="color:#409eff;">已缴纳</span>
+                        <span v-else style="color: #f56c6c">未缴纳</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click.prevent="handleDelete(scope.$index, scope.row)"
+                        >删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!--这里是分页-->
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="query.pageIndex"
+                        :page-size="query.pageSize"
+                        :total="tableData.length"
+                        @current-change="handlePageChange"
+                ></el-pagination>
             </div>
-            <div class="crop-demo">
-                <img :src="cropImg" class="pre-img">
-                <div class="crop-demo-btn">选择图片
-                    <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                </div>
-            </div>
-        
-            <el-dialog title="裁剪图片" :visible.sync="dialogVisible" width="30%">
-                <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="cancelCrop">取 消</el-button>
-                    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                </span>
-            </el-dialog>
         </div>
     </div>
 </template>
 
 <script>
-    import VueCropper  from 'vue-cropperjs';
+    import { mapGetters } from 'vuex'
     export default {
         name: 'upload',
         data: function(){
             return {
-                defaultSrc: require('../../assets/img/img.jpg'),
-                fileList: [],
-                imgSrc: '',
-                cropImg: '',
-                dialogVisible: false,
+                message: "first",
+                showData: [],
+                tableData: [],
+                query: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                temp: {
+                    rent_id: 29123,
+                    landlord: {},
+                    tenant: {},
+                    rent_price: 920,
+                    rent_time: new Date().getTime(),
+                    rent_endtime: new Date().getTime(),
+                    rent_type: 1
+                },
+                temp2: {
+                    rent_id: 19283,
+                    landlord: {},
+                    tenant: {},
+                    rent_price: 920,
+                    rent_time: new Date().getTime(),
+                    rent_endtime: new Date().getTime() ,
+                    rent_type: 0
+                }
             }
         },
-        components: {
-            VueCropper
+        created() {
+            this.temp.landlord = this.userInfo;
+            this.temp.tenant = this.userInfoU;
+            this.temp2.landlord = this.userInfo;
+            this.temp2.tenant = this.userInfoU;
+            for (let i = 0; i < 8; i++){
+                this.temp.rent_price += 100 * (i+1);
+                this.temp2.rent_price += 200 * (i+1);
+                this.tableData.push(this.temp);
+                this.tableData.push(this.temp2)
+            }
+            this.showData = this.tableData.slice(0,10)
+        },
+        computed: {
+            ...mapGetters(["userInfo","house","userInfoU"])
         },
         methods:{
-            setImage(e){
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    this.dialogVisible = true;
-                    this.imgSrc = event.target.result;
-                    this.$refs.cropper && this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
-            },
-            cropImage () {
-                this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL();
-            },
-            cancelCrop(){
-                this.dialogVisible = false;
-                this.cropImg = this.defaultSrc;
-            },
-            imageuploaded(res) {
-                console.log(res)
-            },
-            handleError(){
-                this.$notify.error({
-                    title: '上传失败',
-                    message: '图片上传接口上传失败，可更改为自己的服务器接口'
+            // 删除操作
+            handleDelete(index, row) {
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.showData.splice(index, 1)
+                    this.$message({
+                        message: `删除了ID为${row.rent_id}的条目`,
+                        type: 'success'
+                    });
+                }).catch(() => {
+                    this.$message.error('发生未知错误，删除失败');
                 });
+            },
+            // 编辑操作
+            handleEdit(index, row) {
+            },
+            handleSearch() {
+
+            },
+            handlePageChange(val) {
+                console.log(val);
+                let count = 0;
+                let min = 10 * (val - 1);
+                let max = 10 * (val - 1) + 10;
+                if (max > this.tableData.length + 1) {
+                    count = this.tableData.length + 1 - min;
+                }
+
+                this.showData = this.tableData.slice(min, max);
+            },
+            handleClick(tab, event) {
+                console.log(tab, event);
+                if (tab.index === "0") {
+                    this.showAll()
+                } else if (tab.index === "1") {
+                    this.showNO()
+                } else {
+                    this.showYes()
+                }
+            },
+            showAll() {
+                this.showData = this.tableData.slice(0,10)
+            },
+            showNO() {
+                this.showData = this.tableData.filter( item => {
+                    return item.rent_type === 0
+                })
+            },
+            showYes() {
+                this.showData = this.tableData.filter( item => {
+                    return item.rent_type === 1
+                })
             }
-        },
-        created(){
-            this.cropImg = this.defaultSrc;
+
         }
     }
 </script>
 
 <style scoped>
-    .content-title{
-        font-weight: 400;
-        line-height: 50px;
-        margin: 10px 0;
-        font-size: 22px;
-        color: #1f2f3d;
+    .handle-box {
+        margin-bottom: 20px;
     }
-    .pre-img{   
-        width: 100px;
-        height: 100px;
-        background: #f8f8f8;
-        border: 1px solid #eee;
-        border-radius: 5px;
+
+    .handle-input {
+        width: 300px;
+        display: inline-block;
     }
-    .crop-demo{
-        display: flex;
-        align-items: flex-end;
-    }
-    .crop-demo-btn{
-        position: relative;
-        width: 100px;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 20px;
-        margin-left: 30px;
-        background-color: #409eff;
-        color: #fff;
+    .table {
+        width: 100%;
         font-size: 14px;
-        border-radius: 4px;
-        box-sizing: border-box;
     }
-    .crop-input{
-        position: absolute;
-        width: 100px;
-        height: 40px;
-        left: 0;
-        top: 0;
-        opacity: 0;
-        cursor: pointer;
+    .mr10 {
+        margin-right: 10px;
     }
 </style>

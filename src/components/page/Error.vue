@@ -2,61 +2,235 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 表单</el-breadcrumb-item>
-                <el-breadcrumb-item>markdown编辑器</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-error"></i> 报障管理</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="plugins-tips">
-                mavonEditor：基于Vue的markdown编辑器。
-                访问地址：<a href="https://github.com/hinesboy/mavonEditor" target="_blank">mavonEditor</a>
-            </div>
-            <mavon-editor v-model="content" ref="md" @imgAdd="$imgAdd" @change="change" style="min-height: 600px"/>
-            <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
+            <el-tabs v-model="message">
+                <el-tab-pane label="未处理报障" name="first">
+                    <el-table :data="showErrorOne" :show-header="false" style="width: 100%">
+                        <el-table-column>
+                            <template slot-scope="scope">
+                                <error-item
+                                        :scope="scope"
+                                        @beginDone="beginDone"
+                                        @finishDone="finishDone"
+                                        @deleteShow="deleteShow"
+                                ></error-item>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <div class="pagination">
+                        <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :current-page="showErrorOneQuery.pageIndex"
+                                :page-size="showErrorOneQuery.pageSize"
+                                :total="showErrorOne.length"
+                                @current-change="pageOneChange"
+                        ></el-pagination>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="处理中" name="second">
+                    <template>
+                        <el-table :data="showErrorTwo" :show-header="false" style="width: 100%">
+                            <el-table-column>
+                                <template slot-scope="scope">
+                                    <error-item
+                                            :scope="scope"
+                                            @beginDone="beginDone"
+                                            @finishDone="finishDone"
+                                            @deleteShow="deleteShow"></error-item>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <div class="pagination">
+                            <el-pagination
+                                    background
+                                    layout="total, prev, pager, next"
+                                    :current-page="showErrorTwoQuery.pageIndex"
+                                    :page-size="showErrorTwoQuery.pageSize"
+                                    :total="showErrorTwo.length"
+                                    @current-change="pageTwoChange"
+                            ></el-pagination>
+                        </div>
+                    </template>
+                </el-tab-pane>
+                <el-tab-pane label="处理完成" name="third">
+                    <template>
+                        <el-table :data="showErrorThree" :show-header="false" style="width: 100%">
+                            <el-table-column>
+                                <template slot-scope="scope">
+                                    <error-item
+                                            :scope="scope"
+                                            @beginDone="beginDone"
+                                            @finishDone="finishDone"
+                                            @deleteShow="deleteShow"></error-item>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <div class="pagination">
+                            <el-pagination
+                                    background
+                                    layout="total, prev, pager, next"
+                                    :current-page="showErrorThreeQuery.pageIndex"
+                                    :page-size="showErrorThreeQuery.pageSize"
+                                    :total="showErrorThree.length"
+                                    @current-change="pageTwoChange"
+                            ></el-pagination>
+                        </div>
+                    </template>
+                </el-tab-pane>
+            </el-tabs>
         </div>
     </div>
 </template>
 
 <script>
-    import { mavonEditor } from 'mavon-editor'
-    import 'mavon-editor/dist/css/index.css'
+    import ErrorItem from '../Items/ErrorItem';
+    import { mapGetters } from "vuex"
     export default {
         name: 'markdown',
         data: function(){
             return {
-                content:'',
-                html:'',
-                configs: {
+                message: 'first',
+                searchInput: '',
+                loading: false,
+                search: [],
+                showErrorOne: [
+                    {
+                        obstacle_id: 192873,
+                        obstacle_time: new Date().getTime(),
+                        obstacle_state: 0,// 状态（0未处理、1正在处理、2已完成）
+                        obstacle_detail: "备注信息",
+                        // obstacle_completiontime: "",//完成时间
+                        obstacle_pic: [
+
+                        ],
+                        landlord: this.userInfo,
+                        // house: this.house[0],
+                        tenant: this.userInfoU
+                    }
+                ],
+                showErrorTwo: [
+                    {
+                        obstacle_id: 192873,
+                        obstacle_time: new Date().getTime(),
+                        obstacle_state: 1,// 状态（0未处理、1正在处理、2已完成）
+                        obstacle_detail: "备注信息",
+                        // obstacle_completiontime: new Date().getTime(),//完成时间
+                        obstacle_pic: [
+
+                        ],
+                        landlord: this.userInfo,
+                        // house: this.house[0],
+                        tenant: this.userInfoU
+                    }
+                ],
+                showErrorThree: [
+                    {
+                        obstacle_id: 192873,
+                        obstacle_time: new Date().getTime(),
+                        obstacle_state: 2,// 状态（0未处理、1正在处理、2已完成）
+                        obstacle_detail: "备注信息",
+                        obstacle_completiontime: new Date().getTime(),//完成时间
+                        obstacle_pic: [
+
+                        ],
+                        landlord: this.userInfo,
+                        // house: this.house[0],
+                        tenant: this.userInfoU
+                    }
+                ],
+                showErrorOneQuery: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                showErrorTwoQuery: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                showErrorThreeQuery: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
                 }
-            }
+            };
+
         },
         components: {
-            mavonEditor
+            ErrorItem
         },
         methods: {
-            // 将图片上传到服务器，返回地址替换到md中
-            $imgAdd(pos, $file){
-                var formdata = new FormData();
-                formdata.append('file', $file);
-                // 这里没有服务器供大家尝试，可将下面上传接口替换为你自己的服务器接口
-                this.$axios({
-                    url: '/common/upload',
-                    method: 'post',
-                    data: formdata,
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                }).then((url) => {
-                    this.$refs.md.$img2Url(pos, url);
-                })
+            inputSearch() {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.search = this.orders;
+                }, 3000 * Math.random());
             },
-            change(value, render){
-                // render 为 markdown 解析后的结果
-                this.html = render;
+            stateAdd(orderId) {
+                this.orders.forEach(item => {
+                    console.log(item);
+                    if (item.orderId === orderId) {
+                        if (item.state <= 3) {
+                            item.state += 1;
+                        }
+                    }
+                });
             },
-            submit(){
-                console.log(this.content);
-                console.log(this.html);
-                this.$message.success('提交成功！');
+            pageOneChange(val) {
+
+            },
+            pageTwoChange(val) {
+
+            },
+            beginDone(payload) {
+                let index = this.showErrorOne.findIndex(item => {
+                    return item.obstacle_id === payload.obstacle_id
+                });
+                console.log(index);
+                this.showErrorOne.splice(index, 1);
+                payload.obstacle_state = 1;
+                this.showErrorTwo.push(payload)
+            },
+            finishDone(payload) {
+                let index = this.showErrorTwo.findIndex(item => {
+                    return item.obstacle_id === payload.obstacle_id
+                });
+                console.log(index);
+                this.showErrorTwo.splice(index, 1);
+                payload.obstacle_state = 2;
+                payload.obstacle_completiontime = new Date().getTime()
+                this.showErrorThree.push(payload)
+            },
+            deleteShow(payload) {
+                if (payload.obstacle_state === 0) {
+                    let index = this.showErrorOne.findIndex(item => {
+                        return item.obstacle_id === payload.obstacle_id
+                    });
+                    this.showErrorOne.splice(index, 1);
+                } else if (payload.obstacle_state === 1){
+                    let index = this.showErrorTwo.findIndex(item => {
+                        return item.obstacle_id === payload.obstacle_id
+                    });this.showErrorTwo.splice(index, 1);
+
+                } else {
+                    let index = this.showErrorThree.findIndex(item => {
+                        return item.obstacle_id === payload.obstacle_id
+                    });this.showErrorThree.splice(index, 1);
+                }
             }
+
+        },
+        computed: {
+            ...mapGetters(["userInfo", "house", "userInfoU"]),
         }
     }
 </script>
@@ -64,4 +238,5 @@
     .editor-btn{
         margin-top: 20px;
     }
+
 </style>

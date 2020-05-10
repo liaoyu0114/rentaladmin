@@ -2,84 +2,184 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb>
-                <el-breadcrumb-item>新增菜品</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-calendar"></i>看房管理</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="form-box">
-                <el-form ref="form" :model="form" label-width="100px" label-position="left">
-                    <el-form-item label="菜品名称">
-                        <el-input v-model="form.name" placeholder="输入菜品名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="菜品原材料">
-                        <el-input v-model="form.region" placeholder="请以逗号分隔"></el-input>
-                    </el-form-item>
-                    <el-form-item label="菜品图片">
-                        <el-col>
-                            <el-upload
-                                class="upload-demo"
-                                action="https://jsonplaceholder.typicode.com/posts/"
-                                multiple
-                                :file-list="form.filelist"
-                                :limit="3"
-                            >
-                                <el-button size="small" type="primary">点击上传</el-button>
-                                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                            </el-upload>
-                        </el-col>
-                    </el-form-item>
-                    <el-form-item label="菜品价格">
-                        <el-input type="number" v-model="form.price" min="0"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="onSubmit">表单提交</el-button>
-                        <el-button>取消</el-button>
-                    </el-form-item>
-                </el-form>
-            </div>
+            <el-tabs v-model="message">
+                <el-tab-pane label="看房申请" name="first">
+                    <el-table :data="showHouseOne" :show-header="false" style="width: 100%">
+                        <el-table-column>
+                            <template slot-scope="scope">
+                                <show-house-item
+                                        :scope="scope"
+                                        @cannelShow="cannelShow"
+                                        @deleteShow="deleteShow"
+                                ></show-house-item>
+                            </template>
+                        </el-table-column>
+                        <!-- <el-table-column prop="date" width="180"></el-table-column>
+                        <el-table-column width="120">
+                            <template slot-scope="scope">
+                                <el-button size="small" @click="handleRead(scope.$index)">确认订单</el-button>
+                            </template>
+                        </el-table-column>-->
+                    </el-table>
+
+                    <div class="pagination">
+                        <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :current-page="showHouseOneQuery.pageIndex"
+                                :page-size="showHouseOneQuery.pageSize"
+                                :total="showHouseOne.length"
+                                @current-change="pageOneChange"
+                        ></el-pagination>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="已看房" name="second">
+                    <template>
+                        <el-table :data="showHouseTwo" :show-header="false" style="width: 100%">
+                            <el-table-column>
+                                <template slot-scope="scope">
+                                    <show-house-item
+                                            :scope="scope"
+                                            @cannelShow="cannelShow"
+                                            @deleteShow="deleteShow"></show-house-item>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <div class="pagination">
+                            <el-pagination
+                                    background
+                                    layout="total, prev, pager, next"
+                                    :current-page="showHouseTwoQuery.pageIndex"
+                                    :page-size="showHouseTwoQuery.pageSize"
+                                    :total="showHouseTwo.length"
+                                    @current-change="pageTwoChange"
+                            ></el-pagination>
+                        </div>
+                    </template>
+                </el-tab-pane>
+            </el-tabs>
         </div>
     </div>
 </template>
 
 <script>
-export default {
-    name: 'baseform',
-    data() {
-        return {
-            form: {
-                name: '',
-                region: '',
-                filelist:[],
-                price: ''
+    import ShowHouseItem from '../Items/ShowHouseItem';
+    import { mapGetters } from "vuex"
+    export default {
+        name: 'baseform',
+        components: {
+            ShowHouseItem
+        },
+        data() {
+            return {
+                message: 'first',
+                searchInput: '',
+                loading: false,
+                search: [],
+                showHouseOne: [
+                    {
+                        apply_id: 192873,
+                        apply_time: new Date().getTime(),
+                        apply_type: 1,
+                        apply_remake: "备注信息",
+                        apply_liaison: "看房人姓名",
+                        apply_contact: "看房人联系方式",
+                        apply_state: 0,
+                        landlord: this.userInfo,
+                        // house: this.house[0],
+                        tenant: this.userInfoU
+                    }
+                ],
+                showHouseTwo: [
+                    {
+                        apply_id: 192873,
+                        apply_time: new Date().getTime(),
+                        apply_type: 1,
+                        apply_remake: "备注信息",
+                        apply_liaison: "看房人姓名",
+                        apply_contact: "看房人联系方式",
+                        apply_state: 1,
+                        landlord: this.userInfo,
+                        // house: this.house[0],
+                        tenant: this.userInfoU
+                    }
+                ],
+                showHouseOneQuery: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                showHouseTwoQuery: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                }
+            };
+        },
+        methods: {
+            inputSearch() {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.search = this.orders;
+                }, 3000 * Math.random());
+            },
+            stateAdd(orderId) {
+                this.orders.forEach(item => {
+                    console.log(item);
+                    if (item.orderId === orderId) {
+                        if (item.state <= 3) {
+                            item.state += 1;
+                        }
+                    }
+                });
+            },
+            pageOneChange(val) {
+
+            },
+            pageTwoChange(val) {
+
+            },
+            cannelShow(payload) {
+                let index = this.showHouseOne.findIndex(item => {
+                    return item.apply_id === payload.apply_id
+                });
+                console.log(index);
+                this.showHouseOne.splice(index, 1);
+                payload.apply_state = 1;
+                this.showHouseTwo.push(payload)
+            },
+            deleteShow(payload) {
+              if (payload.apply_state === 0) {
+                  let index = this.showHouseOne.findIndex(item => {
+                      return item.apply_id === payload.apply_id
+                  });
+                  this.showHouseOne.splice(index, 1);
+              } else {
+                  let index = this.showHouseTwo.findIndex(item => {
+                      return item.apply_id === payload.apply_id
+                  });this.showHouseTwo.splice(index, 1);
+
+              }
             }
-        };
-    },
-    methods: {
-        onSubmit() {
-            this.$message.success('提交成功！');
+
         },
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
-        },
-        handlePreview(file) {
-            console.log(file);
-        },
-        handleExceed(files, fileList) {
-            this.$message.warning(
-                `当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`
-            );
-        },
-        beforeRemove(file, fileList) {
-            return this.$confirm(`确定移除 ${file.name}？`);
+        computed: {
+            ...mapGetters(["userInfo", "house", "userInfoU"]),
         }
-    }
-};
+    };
 </script>
 
 <style>
-.el-upload--text{
-    width: auto;
-    height: auto;
-    border: none;
-}
+    .el-upload--text{
+        width: auto;
+        height: auto;
+        border: none;
+    }
 </style>

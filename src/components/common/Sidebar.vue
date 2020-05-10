@@ -82,12 +82,12 @@ export default {
                     title: '退房管理'
                 },
                 {
-                    icon: 'el-icon-pie-chart',
+                    icon: 'el-icon-error',
                     index: 'error',
                     title: '报障管理'
                 },
                 {
-                    icon: 'el-icon-rank',
+                    icon: 'el-icon-money',
                     index: 'money',
                     title: '租金管理'
                 },
