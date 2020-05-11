@@ -134,10 +134,5 @@ export default {
 .lease-house-name {
     width: 100%;
 }
-.item-image {
-    width: 70%;
-    border-radius: 10px;
-    height: 128px;
-    overflow: hidden;
-}
+
 </style>

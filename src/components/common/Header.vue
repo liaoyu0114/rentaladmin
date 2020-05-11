@@ -21,7 +21,7 @@
                 </el-popover>
             </div>
         </div>
-        <el-dialog :title="title" :visible.sync="diaVisiable">
+        <el-dialog :title="title" :visible.sync="diaVisiable" width="35%">
             <el-form :model="temp" label-position="left" label-width="80px" v-if="showProfile">
                 <el-form-item label="用户名">
                     <el-input v-model="temp.landlord_nickname" placeholder="请输入昵称"></el-input>
@@ -30,10 +30,13 @@
                     <el-input v-model="temp.landlord_realname" placeholder="请输入姓名"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="temp.landlord_IDnumber" placeholder="请输入姓名"></el-input>
+                    <el-input v-model="temp.landlord_IDnumber" placeholder="请输入身份证号码"></el-input>
                 </el-form-item>
                 <el-form-item label="联系电话">
-                    <el-input v-model="temp.landlord_contact" placeholder="请输入姓名"></el-input>
+                    <el-input v-model="temp.landlord_contact" placeholder="请输入联系电话"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱">
+                    <el-input v-model="temp.landlord_mail" placeholder="请输入邮箱"></el-input>
                 </el-form-item>
                 <el-form-item label="头像">
                     <div class="pic-box">
@@ -100,6 +103,15 @@ export default {
             }
             callback();
         };
+        let validateName = (rule, value, callback) => {
+            console.log(value);
+            if (value === '') {
+                callback(new Error('请输入账号'));
+            } else if (!/^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/.test(value)) {
+                callback('输入正确的手机号');
+            }
+            callback();
+        };
         return {
             diaVisiable: false,
             showProfile: false,
@@ -136,8 +148,8 @@ export default {
             this.title = '查看/修改个人信息';
         },
         changeProfile() {
-   this.$message.success('修改成功');
-                    this.diaVisiable = false;
+            this.$message.success('修改成功');
+            this.diaVisiable = false;
         },
         changPassWord() {
             this.diaVisiable = true;
