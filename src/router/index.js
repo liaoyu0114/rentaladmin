@@ -8,18 +8,13 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/dashboard'
+            redirect: '/myhouse'
         },
         {
             path: '/',
             component: () => import(/* webpackChunkName: "home" */ '../components/common/Home.vue'),
-            meta: { title: '自述文件' },
+            meta: { title: 'RENTALHOUSE管理平台' },
             children: [
-                {
-                    path: '/dashboard',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/Dashboard.vue'),
-                    meta: { title: '系统首页' }
-                },
                 {
                     path: '/myhouse',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/MyHouse.vue'),

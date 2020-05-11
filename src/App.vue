@@ -22,4 +22,10 @@
         /*background-color:#FFFFFF;*/
         /*margin: 0mm;  !* this affects the margin on the content before sending to printer *!*/
     /*}*/
+    .item-image {
+    width: 70%;
+    border-radius: 10px;
+    height: 128px;
+    overflow: hidden;
+}
 </style>

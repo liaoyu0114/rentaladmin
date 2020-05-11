@@ -11,14 +11,9 @@
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" @click="newVisible = true">新增合同</el-button>
+                <el-button type="primary" @click="newPaperFunc">新增合同</el-button>
             </div>
-            <el-table
-                    :data="showData"
-                    border
-                    class="table"
-                    header-cell-class-name="table-header"
-            >
+            <el-table :data="showData" border class="table" header-cell-class-name="table-header">
                 <el-table-column prop="contract_id" label="合同ID" width="70" align="center"></el-table-column>
                 <el-table-column label="房源名称" align="center">
                     <template slot-scope="scope">
@@ -37,29 +32,24 @@
                 <el-table-column label="起租时间" align="center">
                     <template slot-scope="scope">
                         <span>{{scope.row.contract_begintime | formatDate("YYYY-MM-DD HH:mm")}}</span>
-
                     </template>
                 </el-table-column>
                 <el-table-column label="到期时间" align="center">
                     <template slot-scope="scope">
                         <span>{{scope.row.contract_endtime | formatDate("YYYY-MM-DD HH:mm")}}</span>
-
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="270" align="center">
                     <template slot-scope="scope">
                         <el-button
-                                size="mini"
-                                @click.prevent="handleEdit(scope.$index, scope.row)"
+                            size="mini"
+                            @click.prevent="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
+                        <el-button size="mini" @click="showPaperFunc(scope.$index, scope.row)">查看</el-button>
                         <el-button
-                                size="mini"
-                                @click="showPaperFunc(scope.$index, scope.row)"
-                        >查看</el-button>
-                        <el-button
-                                size="mini"
-                                type="danger"
-                                @click.prevent="handleDelete(scope.$index, scope.row)"
+                            size="mini"
+                            type="danger"
+                            @click.prevent="handleDelete(scope.$index, scope.row)"
                         >删除</el-button>
                     </template>
                 </el-table-column>
@@ -67,24 +57,76 @@
             <!--这里是分页-->
             <div class="pagination">
                 <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="query.pageIndex"
-                        :page-size="query.pageSize"
-                        :total="tableData.length"
-                        @current-change="handlePageChange"
+                    background
+                    layout="total, prev, pager, next"
+                    :current-page="query.pageIndex"
+                    :page-size="query.pageSize"
+                    :total="tableData.length"
+                    @current-change="handlePageChange"
                 ></el-pagination>
             </div>
         </div>
         <el-dialog :visible.sync="showPaper" title="查看/打印房屋租赁合同" custom-class="paper-show">
             <show-paper :scope="paper"></show-paper>
         </el-dialog>
+        <el-dialog :title="title" :visible.sync="dialogVisiable" width="30%">
+            <div class="from-box">
+                 <el-form ref="form" :model="paperForm" label-width="100px" label-position="left">
+                <el-form-item label="合同ID" v-if="editPaper">
+                    <el-input v-model="paperForm.contract_id" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="房源">
+                    <el-select v-model="paperForm.house.housingresources_name" placeholder="请选择房源">
+                        <el-option label="房源一" value="新增一号房源"></el-option>
+                        <el-option label="房源二" value="新增二号房源"></el-option>
+                    </el-select>
+                </el-form-item>
+                 <el-form-item label="租客" style="width: 294px">
+                    <el-input v-model="paperForm.tenant.tenant_nickname" placeholder="搜索租客"></el-input>
+                </el-form-item>
+                <el-form-item label="价格" style="width: 294px">
+                    <el-input v-model="paperForm.contract_price" placeholder="输入每月租金" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="租金缴纳方式">
+                    <el-select v-model="paperForm.housingresources_renttype">
+                        <el-option label="押一付一" value="押一付一"></el-option>
+                        <el-option label="押一付三" value="押一付三"></el-option>
+                        <el-option label="半年付" value="半年付"></el-option>
+                        <el-option label="年付" value="年付"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="开始日期" style="width: 294px">
+                    <el-date-picker
+                        type="date"
+                        placeholder="开始日期"
+                        v-model="paperForm.contract_begintime"
+                        style="width: 100%;"
+                    ></el-date-picker>
+                </el-form-item>
+                <el-form-item label="结束日期" style="width: 294px">
+                    <el-date-picker
+                        placeholder="结束日期"
+                        type="date"
+                        v-model="paperForm.contract_endtime"
+                        style="width: 100%;"
+                    ></el-date-picker>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit" v-if="newPaper">立即创建</el-button>
+                     <el-button type="primary" @click="onChange" v-else>确认修改</el-button>
+                    <el-button @click="dialogVisiable = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+            </div>
+           
+        </el-dialog>
     </div>
 </template>
 
 <script>
-    import ShowPaper from '../Items/ShowPaper';
-    import { mapGetters } from "vuex"
+import ShowPaper from '../Items/ShowPaper';
+import { mapGetters } from 'vuex';
 export default {
     name: 'basecharts',
     components: {
@@ -92,8 +134,11 @@ export default {
     },
     data() {
         return {
-            newVisible: false,
+            newPaper: false,
+            editPaper: false,
             showPaper: false,
+            dialogVisiable: false,
+            title: '',
             showData: [],
             tableData: [],
             query: {
@@ -101,35 +146,79 @@ export default {
                 pageIndex: 1,
                 pageSize: 10
             },
-            editForm: { },
+            paperForm: {
+                contract_id: '',
+                contract_price: '',
+                housingresources_renttype: '',
+                contract_begintime: '',
+                contract_endtime: '',
+                house: {
+                    housingresources_name: ''
+                },
+                tenant: {
+                    tenant_nickname: ""
+                }
+            },
             paper: {},
             temp: {
                 contract_id: 2137812,
                 contract_price: 927,
-                housingresources_renttype: "年付",
+                housingresources_renttype: '年付',
                 contract_begintime: new Date().getTime(),
                 contract_endtime: new Date().getTime() + 9999999999999
             }
         };
     },
     created() {
-        this.temp.tenant = this.userInfoU
-        this.temp.landlord = this.userInfo
-        this.temp.house = this.house[0]
-        for (let i=0; i<20; i++) {
-            this.tableData.push(this.temp)
+        this.temp.tenant = this.userInfoU;
+        this.temp.landlord = this.userInfo;
+        this.temp.house = this.house[0];
+        for (let i = 0; i < 20; i++) {
+            this.tableData.push(this.temp);
         }
-        this.showData = this.tableData.slice(0,10)
+        this.showData = this.tableData.slice(0, 10);
     },
     methods: {
+        onChange() {
+           this.showData.map(item => {
+               if (item.contract_id == this.paperForm.contract_id) {
+                   item = this.paperForm
+               }
+               return item
+           })
+           this.dialogVisiable = false
+        },
+        onSubmit() {
+            this.paperForm.contract_id = 82189038
+            this.paperForm.tenant.tenant_realname = "新增realname"
+            this.showData = [this.paperForm].concat(this.showData)
+this.dialogVisiable = false
+        },
+        newPaperFunc() {
+            this.paperForm = {
+                contract_id: '',
+                contract_price: '',
+                housingresources_renttype: '',
+                contract_begintime: '',
+                contract_endtime: '',
+                house: {
+                    housingresources_name: ''
+                },
+                tenant: {
+                    tenant_nickname: ""
+                }
+            }
+            this.dialogVisiable = true;
+            this.newPaper = true;
+            this.editPaper = false;
+            this.title = "添加新合同"
+        },
         showPaperFunc(index, row) {
-            this.showPaper = true
-            this.paper = row
+            this.showPaper = true;
+            this.paper = row;
         },
         //搜索
-        handleSearch() {
-
-        },
+        handleSearch() {},
         // 删除操作
         handleDelete(index, row) {
             // 二次确认删除
@@ -138,13 +227,17 @@ export default {
             })
                 .then(() => {
                     this.$message.success('删除成功');
-                    this.tableData.splice(index, 1);
+                    this.showData.splice(index, 1);
                 })
                 .catch(() => {});
         },
         // 编辑操作
         handleEdit(index, row) {
-            this.editForm = row;
+            this.dialogVisiable = true;
+            this.newPaper = false;
+            this.editPaper = true;
+            this.title = "编辑合同"
+            this.paperForm = row
         },
         // 分页导航
         handlePageChange(val) {
@@ -160,7 +253,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["userInfo", "house", "userInfoU"])
+        ...mapGetters(['userInfo', 'house', 'userInfoU'])
     }
 };
 </script>
@@ -180,10 +273,13 @@ export default {
 .mr10 {
     margin-right: 10px;
 }
-
+.from-box {
+    display: flex;
+    justify-content: center;
+}
 </style>
 <style>
-    .paper-show>.el-dialog__body {
-        padding: 0 20px !important;
-    }
+.paper-show > .el-dialog__body {
+    padding: 0 20px !important;
+}
 </style>

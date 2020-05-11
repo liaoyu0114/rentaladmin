@@ -27,7 +27,8 @@
         </el-col>
         <el-col :span="6" class="lease-house-pic">
           <el-image
-                  style="width: 70%; border-radius: 10px"
+                  class="item-image"
+                        fit="contain"
                   :src="scope.row.house.housingresources_pic[0]"
                   :preview-src-list="scope.row.house.housingresources_pic"></el-image>
         </el-col>

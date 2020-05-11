@@ -52,9 +52,9 @@ const state = {
             housingresources_latitude: "",
             housingresources_address: "地址地址地址",
             housingresources_pic: [
-                "https://assets.hhh233.xyz/181.jpg",
-                "https://assets.hhh233.xyz/045%20%282%29.jpg",
-                "https://assets.hhh233.xyz/05-8.jpg"
+                "https://s1.ax1x.com/2020/04/14/Gxx9yR.jpg",
+                "https://s1.ax1x.com/2020/04/14/GznAK0.jpg",
+                "https://s1.ax1x.com/2020/04/14/Gznlx1.jpg"
             ],
             housingresources_state: ""
         }
