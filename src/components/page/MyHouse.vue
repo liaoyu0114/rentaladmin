@@ -333,9 +333,10 @@
                     // housingresources_pic: [{ required: true, message: '至少上传一张图片', trigger: 'blur' }]
                 },
                 query: {
-                    name: '',
-                    pageIndex: 1,
-                    pageSize: 10
+                    landlord_id: "",
+                    housingresources_name: '',
+                    currIndex: 1,
+                    pageSize: 15
                 },
                 showData: [],
                 tableData: [],
@@ -368,10 +369,16 @@
                 dialogVisible: false,
                 //七牛云配置
                  domin:'https://upload-z2.qiniup.com',
-                 qiniuaddr:'https://assets.hhh233.xyz'
+                 qiniuaddr:'https://assets.hhh233.xyz',
             };
         },
         created() {
+            this.query.landlord_id = this.userInfo.landlord_id
+            this.$post("/selectHousingresourcesByLandlord", this.query).then(res => {
+                console.log(res);
+            }).catch(err => {
+                console.log(err);
+            })
             this.tableData = this.house;
             this.showData = this.tableData;
         },
@@ -401,11 +408,14 @@
             newHouse(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.newForm.housingresources_id = "1234";
-                        console.log(this.newForm);
-                        this.showData.push(this.newForm);
+                        this.newForm.landlord_id = this.userInfo.landlord_id;
+                       this.$post("/addHousingresources",this.newForm).then(res => {
+                           console.log(res);
+                           this.newVisible = false
+                       }).catch(err => {
+                           this.$message.warning("网络错误")
+                       })
                         // this.$refs[formName].resetFields();
-                        this.newVisible = false
                     } else {
                         console.log('error submit!!');
                         return false;

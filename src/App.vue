@@ -3,6 +3,30 @@
         <router-view></router-view>
     </div>
 </template>
+
+<script>
+    export default {
+        name: "app",
+        created () {
+            if (localStorage.phone !== "" && localStorage.password !== "") {
+                let data = {
+                    "landlord_phone": localStorage.phone,
+                    "landlord_password": localStorage.password
+                };
+                this.$post("/loginLandlord", data).then(res => {
+                    if (res.code === "000") {
+                        this.$store.commit("setUserInfo",res.Landlord);
+                        if (this.$route.path === '/login') {
+                            this.$router.push("/")
+                        }
+                    }
+                })
+            }
+
+        }
+    };
+</script>
+
 <style>
     @import "./assets/css/main.css";
     @import "./assets/css/theme/color-green.css";

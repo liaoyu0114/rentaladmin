@@ -16,6 +16,12 @@
                     >
                     </el-input>
                 </el-form-item>
+                <el-form-item prop="password">
+                    <el-switch
+                            v-model="value"
+                            active-text="记住我">
+                    </el-switch>
+                </el-form-item>
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm()" style="font-size: 18px; letter-spacing: 5px">登录</el-button>
                 </div>
@@ -25,37 +31,45 @@
             </el-form>
             <el-dialog title="注册账号" :visible.sync="dialogTableVisible">
                 <div style="display: flex;width: 100%;justify-content: center">
-                    <el-form :model="paramRegist" :rules="rulesRegist" label-width="80px" label-position="left" class="ms-content" style="width: 50%">
-                        <el-form-item prop="username" label="用户名">
-                            <el-input v-model="paramRegist.username" placeholder="请输入账号">
+                    <el-form :model="paramRegist"
+                             :rules="rulesRegist"
+                             ref="regist"
+                             label-width="80px"
+                             label-position="left"
+                             class="ms-content" style="width: 50%">
+                        <el-form-item prop="landlord_phone" label="用户名">
+                            <el-input v-model="paramRegist.landlord_phone" placeholder="请输入账号">
                             </el-input>
                         </el-form-item>
-                        <el-form-item prop="password" label="密码">
+                        <el-form-item prop="landlord_password" label="密码">
                             <el-input
                                     type="password"
                                     placeholder="请输入密码"
-                                    v-model="paramRegist.password"
+                                    v-model="paramRegist.landlord_password"
                             >
                             </el-input>
                         </el-form-item>
-                        <el-form-item prop="repeat" label="重复密码">
+                        <el-form-item prop="landlord_repeat" label="重复密码">
                             <el-input
                                     type="password"
                                     placeholder="请再次输入密码"
-                                    v-model="paramRegist.repeat"
+                                    v-model="paramRegist.landlord_repeat"
                             >
                             </el-input>
                         </el-form-item>
-                        <el-form-item prop="mail" label="邮箱">
+                        <el-form-item prop="landlord_mail" label="邮箱">
                             <el-input
                                     type="text"
                                     placeholder="请再次输入密码"
-                                    v-model="paramRegist.mail"
+                                    v-model="paramRegist.landlord_mail"
                             >
                             </el-input>
                         </el-form-item>
                         <div class="login-btn" style="display: flex;justify-content: center">
-                            <el-button type="primary" class="reg-btn" style="width: 50%">注册</el-button>
+                            <el-button type="primary"
+                                       @click="registLandlord"
+                                       class="reg-btn"
+                                       style="width: 50%">注册</el-button>
                         </div>
                     </el-form>
                 </div>
@@ -66,7 +80,6 @@
 </template>
 
 <script>
-import { businessLogin } from '../../api/index';
 export default {
     data() {
         let validateName = (rule, value, callback) => {
@@ -86,7 +99,7 @@ export default {
             callback();
         };
         let validateRepeat = (rule, value, callback) => {
-            if (value !== this.paramRegist.password) {
+            if (value !== this.paramRegist.landlord_password) {
                 callback(new Error("两次输入密码不正确"));
             }
             callback();
@@ -100,15 +113,16 @@ export default {
             }
         };
         return {
+            value: false,
             param: {
-                username: '18382389886',
-                password: '123460'
+                username: '18382389882',
+                password: '123456'
             },
             paramRegist: {
-                username: "",
-                password: "",
-                repeat: "",
-                mail: ""
+                "landlord_phone": "",
+                "landlord_password": "",
+                "landlord_repeat": "",
+                "landlord_mail": ""
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -116,16 +130,16 @@ export default {
             },
             dialogTableVisible: false,
             rulesRegist: {
-                username: [
+                "landlord_phone": [
                     { required: true, message: '请输入用户名', trigger: 'blur' },
                     { validator: validateName, trigger: "blur" }],
-                password: [
+                "landlord_password": [
                     { required: true, message: '请输入密码', trigger: 'blur' },
                     { validator: validatePass, trigger: "blur" }],
-                repeat: [
+                "landlord_repeat": [
                     { required: true, message: "请输入密码" },
                     { validator: validateRepeat, trigger: "blur" }],
-                mail: [
+                "landlord_mail": [
                     { required: true, message: "邮箱不能为空" },
                     { validator: validateEmail, trigger: "blur" }
                 ]
@@ -137,27 +151,58 @@ export default {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     let data = {
-                        business_phone: this.param.username,
-                        business_password: this.param.password
+                        landlord_phone: this.param.username,
+                        landlord_password: this.param.password
                     };
-                    businessLogin(data)
-                        .then(res => {
-                            if (res.code === '000') {
-                                res.business.business_pic = 'https://assets.hhh233.xyz/defalu-business.png';
-                                this.$store.commit('setUserInfo', res.business);
-                                localStorage.setItem('userId', res.business.business_id);
-                                this.$router.push('/');
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
+                   this.$post('/loginLandlord', data).then(res => {
+                       if (res.code === "000") {
+                         this.$store.commit("setUserInfo", res.Landlord);
+                         if (this.value) {
+                             this.saveLocal()
+                         }
+                         this.$router.push("/")
+                       } else {
+                           this.$message.warning("账号密码不匹配")
+                       }
+                   })
                 } else {
                     this.$message.error('请输入账号和密码');
-                    console.log('error submit!!');
                     return false;
                 }
             });
+        },
+        registLandlord() {
+            this.$refs.regist.validate(valit => {
+                if (valit) {
+                    this.$post("/registLandlord", this.paramRegist).then(res => {
+                        if (res.code === "000") {
+                            let data = {
+                                landlord_phone: this.paramRegist.landlord_phone,
+                                landlord_password: this.paramRegist.landlord_password
+                            };
+                            this.$post('/loginLandlord', data).then(res => {
+                                if (res.code === "000") {
+                                    this.$store.commit("setUserInfo", res.Landlord);
+                                    if (this.value) {
+                                        this.saveLocal()
+                                    }
+                                    this.$router.push("/")
+                                } else {
+                                    this.$message.warning("登陆失败，手动登录")
+                                }
+                            })
+                        } else {
+                            this.$message.error('登陆失败');
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }
+            })
+        },
+        saveLocal() {
+            localStorage.phone = this.param.username
+            localStorage.password = this.param.password
         }
     }
 };

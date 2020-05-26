@@ -148,8 +148,14 @@ export default {
             this.title = '查看/修改个人信息';
         },
         changeProfile() {
-            this.$message.success('修改成功');
-            this.diaVisiable = false;
+            this.$post("/updateLandlord", this.temp).then( res => {
+                console.log(res);
+                if (res.code === "000") {
+
+                }
+            }).catch(err => {
+                this.$message.error("网络错误")
+            })
         },
         changPassWord() {
             this.diaVisiable = true;

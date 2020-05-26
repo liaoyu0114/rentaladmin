@@ -9,18 +9,7 @@ Vue.use(Vuex);
 
 const state = {
     userInfo: {
-        // houser
-        landlord_id: 123,
-        landlord_phone: 18382389882,
-        landlord_password: "",
-        landlord_mail: "1453473547@qq.com",
-        landlord_nickname: "昵称测试",
-        landlord_realname: "真实姓名",
-        landlord_IDnumber: "身份证510xxxxxxxxx",
-        landlord_contact: "联系电话",
-        landlord_pic: "https://s1.ax1x.com/2020/04/17/JVI740.jpg",
-        landlord_sex: "1",
-        landlord_time: new Date()
+
     },
     userInfoU: {
         tenant_id: 2123,
