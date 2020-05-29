@@ -9,7 +9,7 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
+        <el-input v-model="query.housingresources_name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
         <el-button type="primary" v-if="showCannel" @click="handleCannel">取消</el-button>
         <el-button type="primary" @click="newVisible = true">发布新房源</el-button>
@@ -20,6 +20,7 @@
               class="table"
               ref="multipleTable"
               header-cell-class-name="table-header"
+              v-loading="loading"
       >
         <el-table-column prop="housingresources_id" label="房源ID" width="70" align="center"></el-table-column>
         <el-table-column prop="housingresources_name" label="房源名称"></el-table-column>
@@ -80,10 +81,28 @@
           <el-input v-model="editForm.housingresources_name" placeholder="输入房源名称"></el-input>
         </el-form-item>
         <el-form-item label="所在小区">
-          <el-input v-model="editForm.housingresources_village" placeholder="搜索地址"></el-input>
+
+          <el-input v-model="editForm.housingresources_village" placeholder="输入小区"></el-input>
         </el-form-item>
         <el-form-item label="房源地址">
-          <el-input v-model="editForm.housingresources_address" placeholder="搜索地址"></el-input>
+          <el-autocomplete
+            popper-class="my-autocomplete"
+            v-model="editForm.housingresources_address"
+            class="search-el"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入内容"
+            @select="handleSelect"
+            style="width: 100%"
+          >
+            <i class="el-icon-edit el-input__icon"
+               slot="suffix"></i>
+            <template slot-scope="{ item }">
+              <div class="name">{{ item.name }}</div>
+
+              <span class="addr">{{ item.address }}</span>
+            </template>
+          </el-autocomplete>
+          <!--<el-input v-model="editForm.housingresources_address" placeholder="搜索地址"></el-input>-->
         </el-form-item>
         <el-form-item label="出租类型">
           <el-select v-model="editForm.housingresources_category" placeholder="选择出租类型">
@@ -174,7 +193,24 @@
           <el-input v-model="newForm.housingresources_village" placeholder="输入小区"></el-input>
         </el-form-item>
         <el-form-item label="房源地址" prop="housingresources_address">
-          <el-input v-model="newForm.housingresources_address" placeholder="搜索地址"></el-input>
+          <!--<el-input v-model="newForm.housingresources_address" placeholder="搜索地址"></el-input>-->
+          <el-autocomplete
+            popper-class="my-autocomplete"
+            v-model="newForm.housingresources_address"
+            class="search-el"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入内容"
+            @select="handleSelect"
+            style="width: 100%"
+          >
+            <i class="el-icon-edit el-input__icon"
+               slot="suffix"></i>
+            <template slot-scope="{ item }">
+              <div class="name">{{ item.name }}</div>
+
+              <span class="addr">{{ item.address }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item label="出租类型" prop="housingresources_category">
           <el-select v-model="newForm.housingresources_category" placeholder="选择出租类型">
@@ -251,9 +287,9 @@
                   :limit="9"
                   :before-upload="beforeUpload"
                   :on-success="uploadSuccess"
-                  :show-file-list="false"
+                  :on-remove="remove"
           >
-            <el-button size="small" type="primary" plain disabled>点击上传</el-button>
+            <el-button size="small" type="primary" plain>点击上传</el-button>
             <div slot="tip" class="el-upload__tip">本地测试请勿上传，效果参考第一条数据 <br>只能上传jpg/png文件，且不超过10mb</div>
           </el-upload>
           <el-row :gutter="10" v-if="newForm.housingresources_pic.length !== 0">
@@ -272,117 +308,161 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
-    import getToken from "../../api/token"
-    import axios from "axios"
-    // import upload from "../../utils/common"
+  import { mapGetters } from 'vuex';
+  import getToken from '../../api/token';
+  import axios from 'axios';
+  import { text } from '../../api/map';
 
-    export default {
+  export default {
         name: 'basetable',
         data() {
             return {
-                newVisible: false,
-                newForm: {
-                    // "housingresources_category": '',
-                    // "housingresources_village": "",
-                    // "housingresources_type": {
-                    //     first: "1",
-                    //     second: "1",
-                    //     third: "1"
-                    // },
-                    // "housingresources_introduce": '',
-                    // "housingresources_floor": '',
-                    // "housingresources_orientations": '',
-                    // "housingresources_renttype": '',
-                    // "housingresources_price": '',
-                    // "housingresources_area": '',
-                    // "housingresources_longitude": '',
-                    // "housingresources_latitude": '',
-                    // "housingresources_address": '',
-                    // "housingresources_pic": []
-                    housingresources_category: '',
-                    housingresources_village: "",
-                    housingresources_type: {
-                        first: "1",
-                        second: "1",
-                        third: "1"
-                    },
-                    housingresources_introduce: '',
-                    housingresources_floor: '',
-                    housingresources_orientations: '',
-                    housingresources_renttype: '',
-                    housingresources_price: '',
-                    housingresources_area: '',
-                    housingresources_longitude: '',
-                    housingresources_latitude: '',
-                    housingresources_address: '',
-                    housingresources_pic: []
+              loading: true,
+              appKey: "abe346ab804b17ebc88f74f3c0173935",
+              newVisible: false,
+              newForm: {
+                housingresources_category: '',
+                housingresources_village: "",
+                housingresources_type: {
+                  first: "1",
+                  second: "1",
+                  third: "1"
                 },
-                newFormRule: {
-                    housingresources_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-                    housingresources_village: [{ required: true, message: '请输入小区名称', trigger: 'blur' }],
-                    housingresources_address: [{ required: true, message: '请输入小区名称', trigger: 'blur' }],
-                    housingresources_category: [{ required: true, message: '请选择出租类型', trigger: 'blur' }],
-                    housingresources_type: [{ required: true, message: '请选择房型', trigger: 'blur' }],
-                    housingresources_introduce: [{ required: true, message: '请输入介绍', trigger: 'blur' }],
-                    housingresources_floor: [{ required: true, message: '请选择楼层', trigger: 'blur' }],
-                    housingresources_orientations: [{ required: true, message: '请选择朝向', trigger: 'blur' }],
-                    housingresources_renttype: [{ required: true, message: '请选择押金类型', trigger: 'blur' }],
-                    housingresources_price: [{ required: true, message: '请输入每月租金', trigger: 'blur' }],
-                    housingresources_area: [{ required: true, message: '请输入面积', trigger: 'blur' }],
-                    // housingresources_pic: [{ required: true, message: '至少上传一张图片', trigger: 'blur' }]
+                housingresources_introduce: '',
+                housingresources_floor: '',
+                housingresources_orientations: '',
+                housingresources_renttype: '',
+                housingresources_price: '',
+                housingresources_area: '',
+                housingresources_longitude: '',
+                housingresources_latitude: '',
+                housingresources_address: '',
+                housingresources_pic: []
+              },
+              newFormRule: {
+                housingresources_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+                housingresources_village: [{ required: true, message: '请输入小区名称', trigger: 'blur' }],
+                housingresources_address: [{ required: true, message: '请输入小区地址', trigger: ['blur','change'] }],
+                housingresources_category: [{ required: true, message: '请选择出租类型', trigger: 'blur' }],
+                housingresources_type: [{ required: true, message: '请选择房型', trigger: 'blur' }],
+                housingresources_introduce: [{ required: true, message: '请输入介绍', trigger: 'blur' }],
+                housingresources_floor: [{ required: true, message: '请选择楼层', trigger: 'blur' }],
+                housingresources_orientations: [{ required: true, message: '请选择朝向', trigger: 'blur' }],
+                housingresources_renttype: [{ required: true, message: '请选择押金类型', trigger: 'blur' }],
+                housingresources_price: [{ required: true, message: '请输入每月租金', trigger: 'blur' }],
+                housingresources_area: [{ required: true, message: '请输入面积', trigger: 'blur' }],
+                housingresources_pic: [{ required: true, message: '至少上传一张图片', trigger: 'blur' }]
+              },
+              query: {
+                "landlord_id": "",
+                "housingresources_name": '',
+                "currIndex": 1,
+                "pageSize": 15
+              },
+              showData: [],
+              tableData: [],
+              editVisible: false,
+              pageTotal: 0,
+              editForm: {
+                "housingresources_category": '',
+                "housingresources_village": "",
+                "housingresources_type": {
+                  first: "1",
+                  second: "1",
+                  third: "1"
                 },
-                query: {
-                    landlord_id: "",
-                    housingresources_name: '',
-                    currIndex: 1,
-                    pageSize: 15
-                },
-                showData: [],
-                tableData: [],
-                editVisible: false,
-                pageTotal: 0,
-                editForm: {
-                    "housingresources_category": '',
-                    "housingresources_village": "",
-                    "housingresources_type": {
-                        first: "1",
-                        second: "1",
-                        third: "1"
-                    },
-                    "housingresources_introduce": '',
-                    "housingresources_floor": '',
-                    "housingresources_orientations": '',
-                    "housingresources_renttype": '',
-                    "housingresources_price": '',
-                    "housingresources_area": '',
-                    "housingresources_longitude": '',
-                    "housingresources_latitude": '',
-                    "housingresources_address": '',
-                    "housingresources_pic": []
-                },
-                idx: -1,
-                id: -1,
-                data: {},
-                showCannel: false,
-                dialogImageUrl: '',
-                dialogVisible: false,
-                //七牛云配置
-                 domin:'https://upload-z2.qiniup.com',
-                 qiniuaddr:'https://assets.hhh233.xyz',
+                "housingresources_introduce": '',
+                "housingresources_floor": '',
+                "housingresources_orientations": '',
+                "housingresources_renttype": '',
+                "housingresources_price": '',
+                "housingresources_area": '',
+                "housingresources_longitude": '',
+                "housingresources_latitude": '',
+                "housingresources_address": '',
+                "housingresources_pic": []
+              },
+              idx: -1,
+              id: -1,
+              data: {},
+              showCannel: false,
+              dialogImageUrl: '',
+              dialogVisible: false,
+              //七牛云配置
+              domin:'https://upload-z2.qiniup.com',
+              qiniuaddr:'https://assets.hhh233.xyz',
             };
         },
         created() {
-            this.query.landlord_id = this.userInfo.landlord_id
-            this.$post("/selectHousingresourcesByLandlord", this.query).then(res => {
-                console.log(res);
-            }).catch(err => {
-                console.log(err);
-            })
-            this.tableData = this.house;
-            this.showData = this.tableData;
+            this.query.landlord_id = this.userInfo.landlord_id;
+            this.loadHouse();
+        },
+        activated() {
+          this.loadHouse()
         },
         methods: {
+          remove(file, fileList) {
+            console.log(file);
+            console.log(fileList);
+          },
+          loadHouse() {
+            this.$post("/selectHousingresourcesByLandlordId", this.query).then(res => {
+              if (res.code === "000") {
+                this.pageTotal = res.count;
+
+                this.showData = res.housingresourceslist.map(item => {
+                  item.housingresources_pic = JSON.parse(item.housingresources_pic);
+                  item.housingresources_type = JSON.parse(item.housingresources_type)
+                  return item
+                })
+
+              } else {
+                this.$message.warning(res.msg)
+              }
+              this.loading = false
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("网络错误");
+              this.loading = false;
+            })
+          },
+          handleSelect(item) {
+            console.log(item);
+            if (this.newVisible) {
+              this.newForm.housingresources_address = item.pname + item.cityname + item.adname  + item.address + item.name;
+              this.newForm.housingresources_latitude = item.location.split(",")[1];
+              this.newForm.housingresources_longitude = item.location.split(",")[0];
+            }
+
+            if (this.editVisible) {
+              this.editForm.housingresources_address = item.pname + item.cityname + item.adname + item.name + item.address;
+              this.editForm.housingresources_latitude = item.location.split(",")[1];
+              this.editForm.housingresources_longitude = item.location.split(",")[0];
+            }
+
+          },
+          querySearchAsync(queryString, cb) {
+            let params = {
+              key: this.appKey,
+              keywords: queryString,
+              city: "成都"
+            };
+
+            text(params).then(res => {
+              var restaurants = res.pois;
+              var results = queryString
+                ? restaurants.filter(this.createStateFilter(queryString))
+                : restaurants;
+              cb(results);
+            });
+          },
+          createStateFilter(queryString) {
+            return state => {
+              return (
+                state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+              );
+            };
+          },
             beforeUpload(file) {
                 const isJPG = file.type === "image/jpeg" || file.type === "image/png";
                 const isLt10M = file.size / 1024 / 1024 < 10;
@@ -396,11 +476,7 @@
                 return isJPG && isLt10M;
             },
             uploadSuccess(response, file, fileList) {
-
-            },
-            handleRemove(file, fileList) {
-                console.log(file);
-                console.log(fileList);
+              // this.$message.success(`${file}`)
             },
             cannelNewHouse() {
                 this.newVisible = false
@@ -409,11 +485,23 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.newForm.landlord_id = this.userInfo.landlord_id;
-                       this.$post("/addHousingresources",this.newForm).then(res => {
-                           console.log(res);
-                           this.newVisible = false
+                        let data = JSON.parse(JSON.stringify(this.newForm))
+                      data.housingresources_pic = JSON.stringify(data.housingresources_pic)
+                      data.housingresources_type = JSON.stringify(data.housingresources_type)
+                       this.$post("/addHousingresources",data).then(res => {
+                           if (res.code === "000") {
+                             this.$message.success("添加成功");
+                             this.newVisible = false;
+                             this.$refs[formName].resetField();
+                             this.loading = true;
+                             this.loadHouse()
+                           } else {
+                             this.$message.warning(res.msg)
+                           }
+
                        }).catch(err => {
-                           this.$message.warning("网络错误")
+                         console.log(err);
+                         this.$message.warning("网络错误")
                        })
                         // this.$refs[formName].resetFields();
                     } else {
@@ -423,21 +511,14 @@
                 });
             },
             qiniuUp(req) {
-                // upload(req).then(res => {
-                //     this.newForm.pic.push(res.url);
-                //     req.onSuccess(res.req.file)
-                // }).catch(err => {
-                //     console.log(err.err);
-                //     req.onError(err.req.file)
-                // })
                 // 重命名要上传的文件
-                // const keyname = this.getUserInfo.username + new Date() + Math.floor(Math.random() * 100) + '.' + filetype;
                 const keyname = btoa(req.file.name.split(".")[0]) + "." + req.file.name.split(".")[1];
 
                 //axio配置
                 const config = {
                     headers: {'Content-Type': 'multipart/form-data'},
                 };
+
                 //获取七牛云token
                 getToken().then(res => {
                     let formdata = new FormData();
@@ -459,15 +540,18 @@
             },
             // 触发搜索按钮
             handleSearch() {
+            if (this.query.housingresources_name === '') return;
                 this.$set(this.query, 'pageIndex', 1);
-                this.showData = this.tableData.filter(state => {
-                    return state.housingresources_name.toLowerCase().indexOf(this.query.name.toString()) === 0;
-                });
+              this.loading = true;
+                this.loadHouse();
                 this.showCannel = true;
             },
             handleCannel() {
                 this.showCannel = false;
-                this.showData = this.tableData;
+                this.query.pageIndex = 1;
+                this.query.housingresources_name = "";
+                this.loading = true;
+              this.loadHouse()
             },
             // 删除操作
             handleDelete(index, row) {
@@ -476,8 +560,20 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                       this.$post("/delectHousingresources", {
+                         "housingresources_id": this.showData[index].housingresources_id
+                       }).then(res => {
+                         if (res.code === "000") {
+                           this.$message.success("删除成功");
+                           this.loading = true
+                           this.loadHouse()
+                         } else {
+                           this.$message.warning(res.msg)
+                         }
+                       }).catch(err => {
+                         console.log(err);
+                         this.$message.error("网络错误")
+                       })
                     })
                     .catch(() => {});
             },
@@ -550,8 +646,9 @@
     width: 100%;
     font-size: 14px;
   }
-  .red {
-    color: #ff0000;
+  .addr {
+    color: #999;
+    font-size: 10px;
   }
   .mr10 {
     margin-right: 10px;

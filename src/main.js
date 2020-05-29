@@ -11,11 +11,16 @@ import 'babel-polyfill';
 import moment from 'moment'
 import Print from 'vue-print-nb'
 import postMessage from "./api/request"
+import token from "./api/token"
+import axios from "axios"
 
 Vue.use(Print);
 
 Vue.config.productionTip = false;
 Vue.prototype.$post = postMessage;
+Vue.prototype.$token = token
+Vue.prototype.$axios = axios
+
 Vue.use(Vuex)
 Vue.use(ElementUI, {
     size: 'small'

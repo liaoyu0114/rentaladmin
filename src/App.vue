@@ -8,7 +8,7 @@
     export default {
         name: "app",
         created () {
-            if (localStorage.phone !== "" && localStorage.password !== "") {
+            if (localStorage.phone && localStorage.password ) {
                 let data = {
                     "landlord_phone": localStorage.phone,
                     "landlord_password": localStorage.password
