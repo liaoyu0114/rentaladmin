@@ -26,7 +26,7 @@
                         <el-pagination
                             background
                             layout="total, prev, pager, next"
-                            :current-page="leaseOneQuery.pageIndex"
+                            :current-page="leaseOneQuery.currIndex"
                             :page-size="leaseOneQuery.pageSize"
                             :total="leaseOrderOne.length"
                             @current-change="pageOneChange"
@@ -52,7 +52,7 @@
                             <el-pagination
                                 background
                                 layout="total, prev, pager, next"
-                                :current-page="leaseTwoQuery.pageIndex"
+                                :current-page="leaseTwoQuery.currIndex"
                                 :page-size="leaseTwoQuery.pageSize"
                                 :total="leaseOrderTwo.length"
                                 @current-change="pageTwoChange"
@@ -62,17 +62,34 @@
                 </el-tab-pane>
                 <el-tab-pane :label="`新增租赁`" name="third">
                     <template>
-                        <el-form :model="newRental" label-width="100px" label-position="left">
+                        <el-form :model="newRental" ref="newRental" label-width="100px" label-position="left">
                             <el-form-item label="选择租客"  style="width:294px">
-                                <el-input v-model="newRental.tenant.tenant_nickname" placeholder="搜索租客"></el-input>
+                                <!--<el-input v-model="newRental.tenant.tenant_nickname" placeholder="搜索租客"></el-input>-->
+                              <el-autocomplete
+                                popper-class="my-autocomplete"
+                                v-model="newRental.tenant.tenant_nickname"
+                                clearable
+                                class="search-el"
+                                :fetch-suggestions="querySearchAsync"
+                                placeholder="输入租客id搜索"
+                                @select="handleSelect"
+                              >
+                                <i class="el-icon-edit el-input__icon" slot="suffix"></i>
+                                <template slot-scope="{ item }">
+                                  <div class="name">ID: {{ item.tenant_id }}</div>
+
+                                  <span class="addr">name: {{ item.tenant_nickname }}</span>
+                                </template>
+                              </el-autocomplete>
                             </el-form-item>
                             <el-form-item label="选择房源">
                                 <el-select v-model="newRental.house.housingresources_name" placeholder="选择房源">
-                                  <el-option label="可出租房源一" value="可出租房源一"></el-option>
-                                  <el-option label="可出租房源二" value="可出租房源二"></el-option>
-                                  <el-option label="可出租房源三" value="可出租房源三"></el-option>
-                                  <el-option label="可出租房源四" value="可出租房源四"></el-option>
-                                  <el-option label="可出租房源五" value="可出租房源五"></el-option>
+                                  <el-option v-for="item in house"
+                                             :key="item.housingresources_id"
+                                             @change="selcetChange"
+                                             :label="item.housingresources_name"
+                                             :value="item.housingresources_id"></el-option>
+
                                 </el-select>
                             </el-form-item>
                             <el-form-item>
@@ -81,29 +98,29 @@
                         </el-form>
                     </template>
                 </el-tab-pane>
-                <el-tab-pane :label="`搜索`" name="forth">
-                    <template>
-                        <el-input v-model="searchInput" placeholder="请输入内容" @input="inputSearch"></el-input>
-                        <el-table :data="search" :show-header="false" style="width: 100%">
-                            <el-table-column>
-                                <template slot-scope="scope">
-                                    <lease-item :scope="scope" @stateAdd="stateAdd"></lease-item>
-                                </template>
-                            </el-table-column>
-                        </el-table>
+                <!--<el-tab-pane :label="`搜索`" name="forth">-->
+                    <!--<template>-->
+                        <!--<el-input v-model="searchInput" placeholder="请输入内容" @input="inputSearch"></el-input>-->
+                        <!--<el-table :data="search" :show-header="false" style="width: 100%">-->
+                            <!--<el-table-column>-->
+                                <!--<template slot-scope="scope">-->
+                                    <!--<lease-item :scope="scope" @stateAdd="stateAdd"></lease-item>-->
+                                <!--</template>-->
+                            <!--</el-table-column>-->
+                        <!--</el-table>-->
 
-                        <div class="pagination" v-if="leaseOrderThree.length !== 0">
-                            <el-pagination
-                                background
-                                layout="total, prev, pager, next"
-                                :current-page="leaseThreeQuery.pageIndex"
-                                :page-size="leaseThreeQuery.pageSize"
-                                :total="pageTotal"
-                                @current-change="pageThreeChange"
-                            ></el-pagination>
-                        </div>
-                    </template>
-                </el-tab-pane>
+                        <!--<div class="pagination" v-if="leaseOrderThree.length !== 0">-->
+                            <!--<el-pagination-->
+                                <!--background-->
+                                <!--layout="total, prev, pager, next"-->
+                                <!--:current-page="leaseThreeQuery.currIndex"-->
+                                <!--:page-size="leaseThreeQuery.pageSize"-->
+                                <!--:total="pageTotal"-->
+                                <!--@current-change="pageThreeChange"-->
+                            <!--&gt;</el-pagination>-->
+                        <!--</div>-->
+                    <!--</template>-->
+                <!--</el-tab-pane>-->
             </el-tabs>
         </div>
     </div>
@@ -119,6 +136,8 @@ export default {
     },
     data() {
         return {
+          onefirst: false,
+          twofirst: false,
             dialogVisiable: false,
             message: 'first',
             searchInput: '',
@@ -133,57 +152,145 @@ export default {
                 }
             },
             leaseOrderOne: [
-                {
-                    lease_id: 117632713,
-                    lease_time: new Date().getTime(),
-                    lease_type: 1,
-                    landlord: this.userInfo,
-                    // house: this.house[0],
-                    tenant: this.userInfoU
-                }
+
             ],
             leaseOrderTwo: [
-                {
-                    lease_id: 172838492,
-                    lease_time: new Date().getTime(),
-                    lease_type: 0,
-                    landlord: this.userInfo,
-                    // house: this.house[0],
-                    tenant: this.userInfoU
-                }
+
             ],
             leaseOrderThree: [],
             leaseOneQuery: {
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
+
+                "lease_type": '0',
+                "currIndex": 1,
+                "pageSize": 9999
             },
             leaseTwoQuery: {
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
+              "lease_type": '1',
+              "currIndex": 1,
+              "pageSize": 9999
             },
             leaseThreeQuery: {
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
-            }
+              "name": '',
+              "currIndex": 1,
+              "pageSize": 10
+            },
+          query: {
+            "landlord_id": "",
+            "housingresources_name": '',
+            "currIndex": 1,
+            "pageSize": 9999
+          },
+          house:[]
         };
     },
-    created() {},
+    created() {
+      this.loadLeaseOne();
+      this.loadLeaseTwo();
+      this.loadHouse();
+      this.onefirst = true
+      this.twofirst = true
+    },
+  // activated() {
+  //     this.loadLeaseOne()
+  //   this.loadLeaseTwo()
+  //   this.loadHouse()
+  // },
     methods: {
+      selcetChange(item) {
+        console.log(item);
+      },
+      handleSelect(item) {
+        console.log(item);
+        this.newRental.tenant.tenant_nickname = item.tenant_nickname
+        this.newRental.tenant.tenant_id = item.tenant_id
+      },
+      querySearchAsync(queryString, cb) {
+        let params = {
+          "tenant_id": queryString
+        };
+        if (queryString === '') cb();
+        else {
+          this.$post("/selectTenantById", params).then(res => {
+            if (res.code === "000") {
+              cb([res.tenant])
+            } else {
+              // this.$message.warning(res.msg)
+            }
+          }).catch(err => {
+            console.log(err);
+          });
+        }
+      },
+      loadHouse() {
+        this.query.landlord_id = this.userInfo.landlord_id
+        this.$post("/selectHousingresourcesByLandlordId", this.query).then(res => {
+          if (res.code === "000") {
+
+            this.house = res.housingresourceslist.map(item => {
+              item.housingresources_pic = JSON.parse(item.housingresources_pic);
+              item.housingresources_type = JSON.parse(item.housingresources_type)
+              return item
+            })
+
+          } else {
+            this.$message.warning(res.msg)
+          }
+          // this.loading = false
+        }).catch(err => {
+          console.log(err);
+          this.$message.error("网络错误");
+          // this.loading = false;
+        })
+      },
+      loadLeaseOne() {
+        // if (!this.onefirst) {
+          this.leaseOneQuery.landlord_id  = this.userInfo.landlord_id;
+          this.$post("/selectLeaseListByLandlordId", this.leaseOneQuery).then(res => {
+            console.log(res);
+            if (res.code === "000") {
+              this.leaseOrderOne = res.leaseList
+            } else {
+              this.$message.warning(res.msg);
+            }
+          }).catch(err => {
+            console.log(err);
+          })
+        // }
+
+      },
+      loadLeaseTwo() {
+        // if (!this.twofirst) {
+          this.leaseTwoQuery.landlord_id = this.userInfo.landlord_id;
+          this.$post("/selectLeaseListByLandlordId", this.leaseTwoQuery).then(res => {
+            console.log(res);
+            if (res.code === "000") {
+              this.leaseOrderOne = res.leaseList
+            } else {
+              this.$message.warning(res.msg);
+            }
+          }).catch(err => {
+            console.log(err);
+          })
+        // }
+      },
+
         onChange() {
-            this.house[0].housingresources_name = this.newRental.house.housingresources_name
-            this.userInfoU.tenant_nickname = this.newRental.tenant.tenant_nickname
-            this.newRental.lease_id = 123456
-            this.newRental.lease_time = new Date().getTime() - 999999
-            this.newRental.lease_type = 1
-            this.newRental.house = this.house[0]
-            this.newRental.tenant = this.userInfoU
-            this.newRental.landlord = this.userInfo
-            this.leaseOrderOne = [this.newRental].concat(this.leaseOrderOne)
-            this.$message.success("添加成功")
-            this.message = 'first'
+            let data = {
+              "tenant_id": this.newRental.tenant.tenant_id,
+              "housingresources_id": this.newRental.house.housingresources_name
+            }
+            this.$post("/AddLease", data).then(res => {
+              if (res.code === "000") {
+                this.$message.success("添加成功")
+                this.$refs.newRental.resetFields()
+                this.newRental.tenant.tenant_nickname = ""
+                this.newRental.house.housingresources_name = ""
+              } else {
+                this.$message.error(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+            })
         },
         inputSearch() {
             this.loading = true;
@@ -223,5 +330,9 @@ export default {
 .handle-row {
     margin-top: 30px;
 }
+  .name {
+    font-size: 12px;
+    color: #999999;
+  }
 </style>
 

@@ -290,7 +290,7 @@
                   :on-remove="remove"
           >
             <el-button size="small" type="primary" plain>点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">本地测试请勿上传，效果参考第一条数据 <br>只能上传jpg/png文件，且不超过10mb</div>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10mb</div>
           </el-upload>
           <el-row :gutter="10" v-if="newForm.housingresources_pic.length !== 0">
             <el-col :span="8" v-for="(item,index) in newForm.pic" :key="index">
@@ -482,6 +482,7 @@
                 this.newVisible = false
             },
             newHouse(formName) {
+            let self = this
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.newForm.landlord_id = this.userInfo.landlord_id;
@@ -492,7 +493,8 @@
                            if (res.code === "000") {
                              this.$message.success("添加成功");
                              this.newVisible = false;
-                             this.$refs[formName].resetField();
+                             self.$refs.newForm.resetFields();
+                             this.newForm.housingresources_pic = []
                              this.loading = true;
                              this.loadHouse()
                            } else {

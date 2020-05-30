@@ -142,9 +142,8 @@ export default {
             showData: [],
             tableData: [],
             query: {
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
+              "currIndex": 1,
+                "pageSize": 10
             },
             paperForm: {
                 contract_id: '',
@@ -166,19 +165,51 @@ export default {
                 housingresources_renttype: '年付',
                 contract_begintime: new Date().getTime(),
                 contract_endtime: new Date().getTime() + 9999999999999
-            }
+            },
+          leaseOneQuery: {
+
+            "lease_type": '0',
+            "currIndex": 1,
+            "pageSize": 9999
+          },
+          // 租客
+          leaseOrderOne: []
         };
     },
     created() {
-        this.temp.tenant = this.userInfoU;
-        this.temp.landlord = this.userInfo;
-        this.temp.house = this.house[0];
-        for (let i = 0; i < 20; i++) {
-            this.tableData.push(this.temp);
-        }
-        this.showData = this.tableData.slice(0, 10);
+      this.query.landlord_id = this.userInfo.landlord_id;
+      this.leaseOneQuery.landlord_id = this.userInfo.landlord_id
+
+      this.loadLeaseOne();
+      this.loadPaper()
+
+
     },
+  activated() {
+    this.loadLeaseOne();
+    this.loadPaper()
+
+  },
     methods: {
+      loadPaper() {
+        this.$post("/selectLeaseListByLandlordId", this.query).then(res => {
+          console.log(res);
+        })
+      },
+      loadLeaseOne() {
+        this.leaseOneQuery.landlord_id  = this.userInfo.landlord_id;
+        this.$post("/selectLeaseListByLandlordId", this.leaseOneQuery).then(res => {
+          console.log(res);
+          if (res.code === "000") {
+            this.leaseOrderOne = res.leaseList
+          } else {
+            this.$message.warning(res.msg);
+          }
+        }).catch(err => {
+          console.log(err);
+        })
+
+      },
         onChange() {
            this.showData.map(item => {
                if (item.contract_id == this.paperForm.contract_id) {
