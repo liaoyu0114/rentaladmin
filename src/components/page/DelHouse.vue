@@ -90,18 +90,6 @@
           // }
         ],
         showHouseTwo: [
-          // {
-          //   apply_id: 192873,
-          //   apply_time: new Date().getTime(),
-          //   apply_type: 0,
-          //   apply_remake: "备注信息",
-          //   apply_liaison: "看房人姓名",
-          //   apply_contact: "看房人联系方式",
-          //   apply_state: 1,
-          //   landlord: this.userInfo,
-          //   // house: this.house[0],
-          //   tenant: this.userInfoU
-          // }
         ],
         showHouseOneQuery: {
           // 未执行
@@ -141,7 +129,17 @@
             console.log(res);
             if (res.code === "000") {
               this.oneCount = res.count;
-              this.showHouseOne = res.applyList
+              this.showHouseOne = rres.applyInfoList.map(item => {
+                item.house = {
+                  housingresources_pic:[],
+                  housingresources_type: {
+                    first: "",
+                    second: "",
+                    third: ""
+                  }
+                };
+                return item
+              })
             }
           })
         }
@@ -152,7 +150,17 @@
             console.log(res);
             if (res.code === "000") {
               this.twoCount = res.count
-              this.showHouseTwo = res.applyList
+              this.showHouseTwo = res.res.applyInfoList.map(item => {
+                item.house = {
+                  housingresources_pic:[],
+                  housingresources_type: {
+                    first: "",
+                    second: "",
+                    third: ""
+                  }
+                };
+                return item
+              })
             }
           })
         }

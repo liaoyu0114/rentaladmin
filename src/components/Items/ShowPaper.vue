@@ -7,8 +7,8 @@
           <p>租赁房屋地址：<span>{{scope.house.housingresources_address}}</span>　</p>　
           <p>依据《中华人民共和国合同法》有关条款，甲乙双方经过充分协商，就乙方租赁甲方房屋事宜达成如下协议：</p>
           <p>一、乙方租赁甲方房屋，以下简称租赁房屋。</p>
-          <p>二、起租时间：<span class="time-bold">{{scope.contract_begintime | formatDate("YYYY-MM-DD")}}</span>，退租时间：<span class="time-bold">{{scope.contract_endtime | formatDate("YYYY-MM-DD") }}</span>。
-            在合同签订之日，乙方需向甲方支付房屋租金<span class="price-color">￥{{scope.contract_price}}</span>。如续租，请提前3天通知甲方，并重新办理租赁手续。<br /></p>　　　　
+          <p>二、起租时间：<span class="time-bold">{{scope.contract.contract_begintime}}</span>，退租时间：<span class="time-bold">{{scope.contract.contract_endtime}}</span>。
+            在合同签订之日，乙方需向甲方支付房屋租金<span class="price-color">￥{{scope.contract.contract_price}}</span>。如续租，请提前3天通知甲方，并重新办理租赁手续。<br /></p>　　　　
           <p>三、违约处理：</p>　
           <p>甲方违约：</p>　
           <p>1．如甲方未能及时将押金退还乙方，甲方每天应按押金的2％向乙方支付违约金；</p>
@@ -44,7 +44,29 @@
         name: 'ShowPaper',
         props: {
             scope: {}
-        }
+        },
+      created() {
+          this.$post("/")
+      },
+      methods: {
+        loadHouse() {
+          this.$post("/selectHousingresourcesById", {
+            "housingresources_id": this.scope.contract.housingresources_id
+          }).then(res => {
+            if (res.code === "000") {
+              let house = res.housingresources;
+              house.housingresources_type = JSON.parse(house.housingresources_type);
+              house.housingresources_pic = JSON.parse(house.housingresources_pic);
+              this.scope.house = house;
+            } else {
+              this.$message.warning(res.msg);
+            }
+          }).catch(err => {
+            console.log(err);
+            this.$message.error("网络错误");
+          });
+        },
+      }
     };
 </script>
 

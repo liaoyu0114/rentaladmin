@@ -2,16 +2,16 @@
   <div class="lease-item">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span class="lease-id">ID：{{scope.row.obstacle_id}}</span>
+        <span class="lease-id">ID：{{scope.obstacle.obstacle_id}}</span>
         <span class="show-time">
-          创建时间：{{scope.row.obstacle_time | formatDate("YYYY-MM-DD HH:mm")}}
+          创建时间：{{scope.obstacle.obstacle_time}}
         </span>
-        <span class="com-time">完成时间： <span v-if="scope.row.obstacle_completiontime">{{scope.row.obstacle_completiontime | formatDate("YYYY-MM-DD HH:mm")}}</span>
+        <span class="com-time">完成时间： <span v-if="scope.obstacle.obstacle_completiontime">{{scope.obstacle.obstacle_completiontime}}</span>
         <span v-else>未完成</span></span>
         <div class="header-button">
-          <div v-if="scope.row.obstacle_state !== 2" style="margin-right: 10px">
-            <el-button type="primary" plain  size="small" @click="beginDone" v-if="scope.row.obstacle_state === 0">开始处理</el-button>
-            <el-button type="primary" plain  size="small" @click="finishDone" v-if="scope.row.obstacle_state === 1">处理完成</el-button>
+          <div v-if="scope.obstacle.obstacle_state !== 2" style="margin-right: 10px">
+            <el-button type="primary" plain  size="small" @click="beginDone" v-if="scope.obstacle.obstacle_state === 0">开始处理</el-button>
+            <el-button type="primary" plain  size="small" @click="finishDone" v-if="scope.obstacle.obstacle_state === 1">处理完成</el-button>
           </div>
           <div><el-button type="danger" plain  size="small" @click="deleteShow">删除</el-button></div>
         </div>
@@ -20,33 +20,33 @@
       <el-row :gutter="10">
         <el-col :span="6" class="lease-user">
           <div class="lease-user-avatar">
-            <el-avatar :src="scope.row.tenant.tenant_pic" :size="75"></el-avatar>
+            <el-avatar :src="scope.tenant.tenant_pic" :size="75"></el-avatar>
           </div>
           <div class="lease-user-name">
-            {{scope.row.tenant.tenant_nickname}}
+            {{scope.tenant.tenant_nickname}}
           </div>
           <div class="lease-user-contact">
-            {{scope.row.tenant.tenant_contact}}
+            {{scope.tenant.tenant_contact}}
           </div>
         </el-col>
         <el-col :span="6" class="lease-house-pic">
           <el-image
                   class="item-image"
                         fit="contain"
-                  :src="scope.row.house.housingresources_pic[0]"
-                  :preview-src-list="scope.row.house.housingresources_pic"></el-image>
+                  :src="scope.house.housingresources_pic[0]"
+                  :preview-src-list="scope.house.housingresources_pic"></el-image>
         </el-col>
         <el-col :span="12" class="lease-houser">
           <div class="lease-house-name">
-            <span>房屋名称：{{scope.row.house.housingresources_name}}</span><br>
-            <span>月租金：{{scope.row.house.housingresources_price}}</span><br>
-            <span>地址：{{scope.row.house.housingresources_address}}</span><br>
-            <span>押金类型：{{scope.row.house.housingresources_renttype}}</span><br>
-            <span>所在小区：{{scope.row.house.housingresources_village}}</span>
+            <span>房屋名称：{{scope.house.housingresources_name}}</span><br>
+            <span>月租金：{{scope.house.housingresources_price}}</span><br>
+            <span>地址：{{scope.house.housingresources_address}}</span><br>
+            <span>押金类型：{{scope.house.housingresources_renttype}}</span><br>
+            <span>所在小区：{{scope.house.housingresources_village}}</span>
           </div>
         </el-col>
         <el-col :span="24" class="show-remark">
-          {{scope.row.obstacle_detail}}
+          {{scope.obstacle.obstacle_detail}}
         </el-col>
       </el-row>
     </el-card>
@@ -63,15 +63,30 @@
             scope: {
             }
         },
-        mounted() {
-            this.scope.row.landlord = this.userInfo;
-            this.scope.row.house = this.house[0]
-            this.scope.row.tenant = this.userInfoU
-        },
         computed: {
-            ...mapGetters(["house","userInfo", "userInfoU"])
+            ...mapGetters(["userInfo"])
         },
+      created() {
+        this.loadHouse()
+      },
         methods: {
+          loadHouse() {
+            this.$post("/selectHousingresourcesById", {
+              "housingresources_id": this.scope.obstacle.housingresources_id
+            }).then(res => {
+              if (res.code === "000") {
+                let house = res.housingresources;
+                house.housingresources_type = JSON.parse(house.housingresources_type);
+                house.housingresources_pic = JSON.parse(house.housingresources_pic);
+                this.scope.house = house;
+              } else {
+                this.$message.warning(res.msg);
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("网络错误");
+            });
+          },
             beginDone() {
                 this.$confirm('即将开始处理, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -79,7 +94,7 @@
                     type: 'warning'
                 }).then(() => {
                     console.log('show');
-                    this.$emit("beginDone",this.scope.row)
+                    this.$emit("beginDone",this.scope)
                 }).catch(() => {
 
                 });
@@ -91,7 +106,7 @@
                     type: 'warning'
                 }).then(() => {
                     console.log('show');
-                    this.$emit("finishDone",this.scope.row)
+                    this.$emit("finishDone",this.scope)
                 }).catch(() => {
 
                 });
@@ -102,7 +117,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$emit("deleteShow", this.scope.row)
+                    this.$emit("deleteShow", this.scope)
                 }).catch(() => {
 
                 });

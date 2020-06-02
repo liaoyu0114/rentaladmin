@@ -15,12 +15,12 @@
         <el-button type="primary" @click="newVisible = true">发布新房源</el-button>
       </div>
       <el-table
-              :data="showData"
-              border
-              class="table"
-              ref="multipleTable"
-              header-cell-class-name="table-header"
-              v-loading="loading"
+        :data="showData"
+        border
+        class="table"
+        ref="multipleTable"
+        header-cell-class-name="table-header"
+        v-loading="loading"
       >
         <el-table-column prop="housingresources_id" label="房源ID" width="70" align="center"></el-table-column>
         <el-table-column prop="housingresources_name" label="房源名称"></el-table-column>
@@ -30,10 +30,10 @@
         <el-table-column label="图片(点击查看大图)" align="center">
           <template slot-scope="scope">
             <el-image
-                    class="table-td-thumb"
-                    fit="cover"
-                    :src="scope.row.housingresources_pic[0]"
-                    :preview-src-list="scope.row.housingresources_pic"
+              class="table-td-thumb"
+              fit="cover"
+              :src="scope.row.housingresources_pic[0]"
+              :preview-src-list="scope.row.housingresources_pic"
             ></el-image>
           </template>
         </el-table-column>
@@ -47,13 +47,13 @@
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
             <el-button
-                    size="mini"
-                    @click.prevent="handleEdit(scope.$index, scope.row)"
+              size="mini"
+              @click.prevent="handleEdit(scope.$index, scope.row)"
             >编辑</el-button>
             <el-button
-                    size="mini"
-                    type="danger"
-                    @click.prevent="handleDelete(scope.$index, scope.row)"
+              size="mini"
+              type="danger"
+              @click.prevent="handleDelete(scope.$index, scope.row)"
             >删除</el-button>
           </template>
         </el-table-column>
@@ -61,12 +61,12 @@
       <!--这里是分页-->
       <div class="pagination">
         <el-pagination
-                background
-                layout="total, prev, pager, next"
-                :current-page="query.pageIndex"
-                :page-size="query.pageSize"
-                :total="pageTotal"
-                @current-change="handlePageChange"
+          background
+          layout="total, prev, pager, next"
+          :current-page="query.pageIndex"
+          :page-size="query.pageSize"
+          :total="pageTotal"
+          @current-change="handlePageChange"
         ></el-pagination>
       </div>
     </div>
@@ -280,14 +280,15 @@
         </el-form-item>
         <el-form-item label="实景照片" prop="housingresources_pic">
           <el-upload
-                  ref="upload"
-                  :action="domin"
-                  :http-request='qiniuUp'
-                  multiple
-                  :limit="9"
-                  :before-upload="beforeUpload"
-                  :on-success="uploadSuccess"
-                  :on-remove="remove"
+            ref="upload"
+            :action="domin"
+            :http-request='qiniuUp'
+            multiple
+            :limit="9"
+            :before-upload="beforeUpload"
+            :on-success="uploadSuccess"
+            :on-remove="remove"
+            :file-list="newForm.housingresources_pic"
           >
             <el-button size="small" type="primary" plain>点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10mb</div>
@@ -314,306 +315,313 @@
   import { text } from '../../api/map';
 
   export default {
-        name: 'basetable',
-        data() {
-            return {
-              loading: true,
-              appKey: "abe346ab804b17ebc88f74f3c0173935",
-              newVisible: false,
-              newForm: {
-                housingresources_category: '',
-                housingresources_village: "",
-                housingresources_type: {
-                  first: "1",
-                  second: "1",
-                  third: "1"
-                },
-                housingresources_introduce: '',
-                housingresources_floor: '',
-                housingresources_orientations: '',
-                housingresources_renttype: '',
-                housingresources_price: '',
-                housingresources_area: '',
-                housingresources_longitude: '',
-                housingresources_latitude: '',
-                housingresources_address: '',
-                housingresources_pic: []
-              },
-              newFormRule: {
-                housingresources_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-                housingresources_village: [{ required: true, message: '请输入小区名称', trigger: 'blur' }],
-                housingresources_address: [{ required: true, message: '请输入小区地址', trigger: ['blur','change'] }],
-                housingresources_category: [{ required: true, message: '请选择出租类型', trigger: 'blur' }],
-                housingresources_type: [{ required: true, message: '请选择房型', trigger: 'blur' }],
-                housingresources_introduce: [{ required: true, message: '请输入介绍', trigger: 'blur' }],
-                housingresources_floor: [{ required: true, message: '请选择楼层', trigger: 'blur' }],
-                housingresources_orientations: [{ required: true, message: '请选择朝向', trigger: 'blur' }],
-                housingresources_renttype: [{ required: true, message: '请选择押金类型', trigger: 'blur' }],
-                housingresources_price: [{ required: true, message: '请输入每月租金', trigger: 'blur' }],
-                housingresources_area: [{ required: true, message: '请输入面积', trigger: 'blur' }],
-                housingresources_pic: [{ required: true, message: '至少上传一张图片', trigger: 'blur' }]
-              },
-              query: {
-                "landlord_id": "",
-                "housingresources_name": '',
-                "currIndex": 1,
-                "pageSize": 15
-              },
-              showData: [],
-              tableData: [],
-              editVisible: false,
-              pageTotal: 0,
-              editForm: {
-                "housingresources_category": '',
-                "housingresources_village": "",
-                "housingresources_type": {
-                  first: "1",
-                  second: "1",
-                  third: "1"
-                },
-                "housingresources_introduce": '',
-                "housingresources_floor": '',
-                "housingresources_orientations": '',
-                "housingresources_renttype": '',
-                "housingresources_price": '',
-                "housingresources_area": '',
-                "housingresources_longitude": '',
-                "housingresources_latitude": '',
-                "housingresources_address": '',
-                "housingresources_pic": []
-              },
-              idx: -1,
-              id: -1,
-              data: {},
-              showCannel: false,
-              dialogImageUrl: '',
-              dialogVisible: false,
-              //七牛云配置
-              domin:'https://upload-z2.qiniup.com',
-              qiniuaddr:'https://assets.hhh233.xyz',
-            };
-        },
-        created() {
-            this.query.landlord_id = this.userInfo.landlord_id;
-            this.loadHouse();
-        },
-        activated() {
-          this.loadHouse()
-        },
-        methods: {
-          remove(file, fileList) {
-            console.log(file);
-            console.log(fileList);
+    name: 'basetable',
+    data() {
+      return {
+        loading: true,
+        appKey: "abe346ab804b17ebc88f74f3c0173935",
+        newVisible: false,
+        newForm: {
+          housingresources_category: '',
+          housingresources_village: "",
+          housingresources_type: {
+            first: "1",
+            second: "1",
+            third: "1"
           },
-          loadHouse() {
-            this.$post("/selectHousingresourcesByLandlordId", this.query).then(res => {
+          housingresources_introduce: '',
+          housingresources_floor: '',
+          housingresources_orientations: '',
+          housingresources_renttype: '',
+          housingresources_price: '',
+          housingresources_area: '',
+          housingresources_longitude: '',
+          housingresources_latitude: '',
+          housingresources_address: '',
+          housingresources_pic: []
+        },
+        newFormRule: {
+          housingresources_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+          housingresources_village: [{ required: true, message: '请输入小区名称', trigger: 'blur' }],
+          housingresources_address: [{ required: true, message: '请输入小区地址', trigger: ['blur','change'] }],
+          housingresources_category: [{ required: true, message: '请选择出租类型', trigger: 'blur' }],
+          housingresources_type: [{ required: true, message: '请选择房型', trigger: 'blur' }],
+          housingresources_introduce: [{ required: true, message: '请输入介绍', trigger: 'blur' }],
+          housingresources_floor: [{ required: true, message: '请选择楼层', trigger: 'blur' }],
+          housingresources_orientations: [{ required: true, message: '请选择朝向', trigger: 'blur' }],
+          housingresources_renttype: [{ required: true, message: '请选择押金类型', trigger: 'blur' }],
+          housingresources_price: [{ required: true, message: '请输入每月租金', trigger: 'blur' }],
+          housingresources_area: [{ required: true, message: '请输入面积', trigger: 'blur' }],
+          housingresources_pic: [{ required: true, message: '至少上传一张图片', trigger: 'blur' }]
+        },
+        query: {
+          "landlord_id": "",
+          "housingresources_name": '',
+          "currIndex": 1,
+          "pageSize": 15
+        },
+        showData: [],
+        tableData: [],
+        editVisible: false,
+        pageTotal: 0,
+        editForm: {
+          "housingresources_category": '',
+          "housingresources_village": "",
+          "housingresources_type": {
+            first: "1",
+            second: "1",
+            third: "1"
+          },
+          "housingresources_introduce": '',
+          "housingresources_floor": '',
+          "housingresources_orientations": '',
+          "housingresources_renttype": '',
+          "housingresources_price": '',
+          "housingresources_area": '',
+          "housingresources_longitude": '',
+          "housingresources_latitude": '',
+          "housingresources_address": '',
+          "housingresources_pic": []
+        },
+        idx: -1,
+        id: -1,
+        data: {},
+        showCannel: false,
+        dialogImageUrl: '',
+        dialogVisible: false,
+        //七牛云配置
+        domin:'https://upload-z2.qiniup.com',
+        qiniuaddr:'https://assets.hhh233.xyz',
+      };
+    },
+    created() {
+      this.query.landlord_id = this.userInfo.landlord_id;
+      this.loadHouse();
+    },
+    activated() {
+      this.loadHouse()
+    },
+    methods: {
+      remove(file, fileList) {
+        console.log(file);
+        console.log(fileList);
+      },
+      loadHouse() {
+        this.$post("/selectHousingresourcesByLandlordId", this.query).then(res => {
+          if (res.code === "000") {
+            this.pageTotal = res.count;
+
+            this.showData = res.housingresourceslist.map(item => {
+              item.housingresources_pic = JSON.parse(item.housingresources_pic);
+              item.housingresources_type = JSON.parse(item.housingresources_type)
+              return item
+            })
+
+          } else {
+            this.$message.warning(res.msg)
+          }
+          this.loading = false
+        }).catch(err => {
+          console.log(err);
+          this.$message.error("网络错误");
+          this.loading = false;
+        })
+      },
+      handleSelect(item) {
+        console.log(item);
+        if (this.newVisible) {
+          this.newForm.housingresources_address = item.pname + item.cityname + item.adname  + item.address + item.name;
+          this.newForm.housingresources_latitude = item.location.split(",")[1];
+          this.newForm.housingresources_longitude = item.location.split(",")[0];
+        }
+
+        if (this.editVisible) {
+          this.editForm.housingresources_address = item.pname + item.cityname + item.adname + item.name + item.address;
+          this.editForm.housingresources_latitude = item.location.split(",")[1];
+          this.editForm.housingresources_longitude = item.location.split(",")[0];
+        }
+
+      },
+      querySearchAsync(queryString, cb) {
+        let params = {
+          key: this.appKey,
+          keywords: queryString,
+          city: "成都"
+        };
+
+        text(params).then(res => {
+          var restaurants = res.pois;
+          var results = queryString
+            ? restaurants.filter(this.createStateFilter(queryString))
+            : restaurants;
+          cb(results);
+        });
+      },
+      createStateFilter(queryString) {
+        return state => {
+          return (
+            state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+          );
+        };
+      },
+      beforeUpload(file) {
+        const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+        const isLt10M = file.size / 1024 / 1024 < 10;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG/PNG 格式!');
+        }
+        if (!isLt10M) {
+          this.$message.error('上传头像图片大小不能超过 10MB!');
+        }
+        return isJPG && isLt10M;
+      },
+      uploadSuccess(response, file, fileList) {
+        // this.$message.success(`${file}`)
+        this.$message.success(`${file.name} 上传成功`)
+      },
+      cannelNewHouse() {
+        this.newVisible = false
+      },
+      newHouse(formName) {
+        let self = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.newForm.landlord_id = this.userInfo.landlord_id;
+            let data = JSON.parse(JSON.stringify(this.newForm));
+            data.housingresources_pic = data.housingresources_pic.map(item => {
+              return item.url
+            });
+            data.housingresources_pic = JSON.stringify(data.housingresources_pic)
+            data.housingresources_type = JSON.stringify(data.housingresources_type)
+            this.$post("/addHousingresources",data).then(res => {
               if (res.code === "000") {
-                this.pageTotal = res.count;
-
-                this.showData = res.housingresourceslist.map(item => {
-                  item.housingresources_pic = JSON.parse(item.housingresources_pic);
-                  item.housingresources_type = JSON.parse(item.housingresources_type)
-                  return item
-                })
-
+                this.$message.success("添加成功");
+                this.newVisible = false;
+                self.$refs.newForm.resetFields();
+                this.newForm.housingresources_pic = []
+                this.loading = true;
+                this.loadHouse()
               } else {
                 this.$message.warning(res.msg)
               }
-              this.loading = false
+
             }).catch(err => {
               console.log(err);
-              this.$message.error("网络错误");
-              this.loading = false;
+              this.$message.warning("网络错误")
             })
-          },
-          handleSelect(item) {
-            console.log(item);
-            if (this.newVisible) {
-              this.newForm.housingresources_address = item.pname + item.cityname + item.adname  + item.address + item.name;
-              this.newForm.housingresources_latitude = item.location.split(",")[1];
-              this.newForm.housingresources_longitude = item.location.split(",")[0];
-            }
+            // this.$refs[formName].resetFields();
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      qiniuUp(req) {
+        // 重命名要上传的文件
+        const keyname = btoa(req.file.name.split(".")[0]) + "." + req.file.name.split(".")[1];
 
-            if (this.editVisible) {
-              this.editForm.housingresources_address = item.pname + item.cityname + item.adname + item.name + item.address;
-              this.editForm.housingresources_latitude = item.location.split(",")[1];
-              this.editForm.housingresources_longitude = item.location.split(",")[0];
-            }
+        //axio配置
+        const config = {
+          headers: {'Content-Type': 'multipart/form-data'},
+        };
 
-          },
-          querySearchAsync(queryString, cb) {
-            let params = {
-              key: this.appKey,
-              keywords: queryString,
-              city: "成都"
-            };
-
-            text(params).then(res => {
-              var restaurants = res.pois;
-              var results = queryString
-                ? restaurants.filter(this.createStateFilter(queryString))
-                : restaurants;
-              cb(results);
+        //获取七牛云token
+        getToken().then(res => {
+          let formdata = new FormData();
+          formdata.append('file', req.file);
+          formdata.append('token', res.uploadToken);
+          formdata.append('key', keyname);
+          // 获取到凭证之后再将文件上传到七牛云空间
+          axios.post(this.domin, formdata, config).then(res => {
+            console.log(res);
+            let url = this.qiniuaddr + '/' + res.data.key;
+            this.newForm.housingresources_pic.push({
+              name: req.file.name,
+              url: url
             });
-          },
-          createStateFilter(queryString) {
-            return state => {
-              return (
-                state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-              );
-            };
-          },
-            beforeUpload(file) {
-                const isJPG = file.type === "image/jpeg" || file.type === "image/png";
-                const isLt10M = file.size / 1024 / 1024 < 10;
-
-                if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG/PNG 格式!');
-                }
-                if (!isLt10M) {
-                    this.$message.error('上传头像图片大小不能超过 10MB!');
-                }
-                return isJPG && isLt10M;
-            },
-            uploadSuccess(response, file, fileList) {
-              // this.$message.success(`${file}`)
-            },
-            cannelNewHouse() {
-                this.newVisible = false
-            },
-            newHouse(formName) {
-            let self = this
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.newForm.landlord_id = this.userInfo.landlord_id;
-                        let data = JSON.parse(JSON.stringify(this.newForm))
-                      data.housingresources_pic = JSON.stringify(data.housingresources_pic)
-                      data.housingresources_type = JSON.stringify(data.housingresources_type)
-                       this.$post("/addHousingresources",data).then(res => {
-                           if (res.code === "000") {
-                             this.$message.success("添加成功");
-                             this.newVisible = false;
-                             self.$refs.newForm.resetFields();
-                             this.newForm.housingresources_pic = []
-                             this.loading = true;
-                             this.loadHouse()
-                           } else {
-                             this.$message.warning(res.msg)
-                           }
-
-                       }).catch(err => {
-                         console.log(err);
-                         this.$message.warning("网络错误")
-                       })
-                        // this.$refs[formName].resetFields();
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
-            qiniuUp(req) {
-                // 重命名要上传的文件
-                const keyname = btoa(req.file.name.split(".")[0]) + "." + req.file.name.split(".")[1];
-
-                //axio配置
-                const config = {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                };
-
-                //获取七牛云token
-                getToken().then(res => {
-                    let formdata = new FormData();
-                    formdata.append('file', req.file);
-                    formdata.append('token', res.uploadToken);
-                    formdata.append('key', keyname);
-                    // 获取到凭证之后再将文件上传到七牛云空间
-                    axios.post(this.domin, formdata, config).then(res => {
-                        console.log(res);
-                        let url = this.qiniuaddr + '/' + res.data.key;
-                        this.newForm.housingresources_pic.push(url);
-                        req.onSuccess(req.file);
-                    }).catch(err => {
-                        console.log(err);
-                        //上传失败事件
-                        req.onError(req.file);
-                    })
-                })
-            },
-            // 触发搜索按钮
-            handleSearch() {
-            if (this.query.housingresources_name === '') return;
-                this.$set(this.query, 'pageIndex', 1);
-              this.loading = true;
-                this.loadHouse();
-                this.showCannel = true;
-            },
-            handleCannel() {
-                this.showCannel = false;
-                this.query.pageIndex = 1;
-                this.query.housingresources_name = "";
-                this.loading = true;
-              this.loadHouse()
-            },
-            // 删除操作
-            handleDelete(index, row) {
-                // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                       this.$post("/delectHousingresources", {
-                         "housingresources_id": this.showData[index].housingresources_id
-                       }).then(res => {
-                         if (res.code === "000") {
-                           this.$message.success("删除成功");
-                           this.loading = true
-                           this.loadHouse()
-                         } else {
-                           this.$message.warning(res.msg)
-                         }
-                       }).catch(err => {
-                         console.log(err);
-                         this.$message.error("网络错误")
-                       })
-                    })
-                    .catch(() => {});
-            },
-            // 编辑操作
-            handleEdit(index, row) {
-                this.idx = index;
-                this.editForm = row;
-                this.editVisible = true;
-            },
-            // 保存编辑
-            saveEdit(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.editVisible = false;
-                        this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
-            // 分页导航
-            handlePageChange(val) {
-                console.log(val);
-                let count = 0;
-                let min = 10 * (val - 1);
-                let max = 10 * (val - 1) + 10;
-                if (max > this.tableData.length + 1) {
-                    count = this.tableData.length + 1 - min;
-                }
-
-                this.showData = this.tableData.slice(min, max);
-            }
-        },
-        computed: {
-            ...mapGetters(["userInfo", "house"])
+            req.onSuccess(req.file);
+          }).catch(err => {
+            console.log(err);
+            //上传失败事件
+            req.onError(req.file);
+          })
+        })
+      },
+      // 触发搜索按钮
+      handleSearch() {
+        if (this.query.housingresources_name === '') return;
+        this.$set(this.query, 'pageIndex', 1);
+        this.loading = true;
+        this.loadHouse();
+        this.showCannel = true;
+      },
+      handleCannel() {
+        this.showCannel = false;
+        this.query.pageIndex = 1;
+        this.query.housingresources_name = "";
+        this.loading = true;
+        this.loadHouse()
+      },
+      // 删除操作
+      handleDelete(index, row) {
+        // 二次确认删除
+        this.$confirm('确定要删除吗？', '提示', {
+          type: 'warning'
+        })
+          .then(() => {
+            this.$post("/delectHousingresources", {
+              "housingresources_id": this.showData[index].housingresources_id
+            }).then(res => {
+              if (res.code === "000") {
+                this.$message.success("删除成功");
+                this.loading = true
+                this.loadHouse()
+              } else {
+                this.$message.warning(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("网络错误")
+            })
+          })
+          .catch(() => {});
+      },
+      // 编辑操作
+      handleEdit(index, row) {
+        this.idx = index;
+        this.editForm = row;
+        this.editVisible = true;
+      },
+      // 保存编辑
+      saveEdit(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.editVisible = false;
+            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      // 分页导航
+      handlePageChange(val) {
+        console.log(val);
+        let count = 0;
+        let min = 10 * (val - 1);
+        let max = 10 * (val - 1) + 10;
+        if (max > this.tableData.length + 1) {
+          count = this.tableData.length + 1 - min;
         }
-    };
+
+        this.showData = this.tableData.slice(min, max);
+      }
+    },
+    computed: {
+      ...mapGetters(["userInfo", "house"])
+    }
+  };
 </script>
 <style>
   .el-upload--text {

@@ -12,7 +12,7 @@
             <el-table-column>
               <template slot-scope="scope">
                 <error-item
-                  :scope="scope"
+                  :scope="scope.row"
                   @beginDone="beginDone"
                   @finishDone="finishDone"
                   @deleteShow="deleteShow"
@@ -39,7 +39,7 @@
               <el-table-column>
                 <template slot-scope="scope">
                   <error-item
-                    :scope="scope"
+                    :scope="scope.row"
                     @beginDone="beginDone"
                     @finishDone="finishDone"
                     @deleteShow="deleteShow"></error-item>
@@ -65,7 +65,7 @@
               <el-table-column>
                 <template slot-scope="scope">
                   <error-item
-                    :scope="scope"
+                    :scope="scope.row"
                     @beginDone="beginDone"
                     @finishDone="finishDone"
                     @deleteShow="deleteShow"></error-item>
@@ -104,51 +104,9 @@
         threeCount: 0,
         loading: false,
         search: [],
-        showErrorOne: [
-          {
-            obstacle_id: 192873,
-            obstacle_time: new Date().getTime(),
-            obstacle_state: 0,// 状态（0未处理、1正在处理、2已完成）
-            obstacle_detail: "备注信息",
-            // obstacle_completiontime: "",//完成时间
-            obstacle_pic: [
-
-            ],
-            landlord: this.userInfo,
-            // house: this.house[0],
-            tenant: this.userInfoU
-          }
-        ],
-        showErrorTwo: [
-          {
-            obstacle_id: 192873,
-            obstacle_time: new Date().getTime(),
-            obstacle_state: 1,// 状态（0未处理、1正在处理、2已完成）
-            obstacle_detail: "备注信息",
-            // obstacle_completiontime: new Date().getTime(),//完成时间
-            obstacle_pic: [
-
-            ],
-            landlord: this.userInfo,
-            // house: this.house[0],
-            tenant: this.userInfoU
-          }
-        ],
-        showErrorThree: [
-          {
-            obstacle_id: 192873,
-            obstacle_time: new Date().getTime(),
-            obstacle_state: 2,// 状态（0未处理、1正在处理、2已完成）
-            obstacle_detail: "备注信息",
-            obstacle_completiontime: new Date().getTime(),//完成时间
-            obstacle_pic: [
-
-            ],
-            landlord: this.userInfo,
-            // house: this.house[0],
-            tenant: this.userInfoU
-          }
-        ],
+        showErrorOne: [],
+        showErrorTwo: [],
+        showErrorThree: [],
         showErrorOneQuery: {
           "obstacle_state": 0,
           "currIndex": 1,
@@ -189,7 +147,17 @@
           console.log(res);
           if (res.code === "000") {
             this.oneCount = res.count
-            this.showErrorOne = res.obstacleList
+            this.showErrorOne = res.obstacleInfoList.map(item => {
+              item.house = {
+                housingresources_type: {
+                  first: "",
+                  second: "",
+                  third: ""
+                },
+                housingresources_pic: []
+              };
+              return item
+            })
           }
         })
       },
@@ -198,7 +166,17 @@
           console.log(res);
           if (res.code === "000") {
             this.twoCount = res.count;
-            this.showErrorTwo = res.obstacleList
+            this.showErrorTwo = res.obstacleInfoList.map(item => {
+              item.house = {
+                housingresources_type: {
+                  first: "",
+                  second: "",
+                  third: ""
+                },
+                housingresources_pic: []
+              };
+              return item
+            })
           }
         })
       },
@@ -207,7 +185,17 @@
           console.log(res);
           if (res.code === "000") {
             this.threeCount = res.count;
-            this.showErrorThree = res.obstacleList
+            this.showErrorThree = res.obstacleInfoList.map(item => {
+              item.house = {
+                housingresources_type: {
+                  first: "",
+                  second: "",
+                  third: ""
+                },
+                housingresources_pic: []
+              }
+              return item
+            })
           }
         })
       },
@@ -224,23 +212,42 @@
         this.loadDone()
       },
       beginDone(payload) {
-        let index = this.showErrorOne.findIndex(item => {
-          return item.obstacle_id === payload.obstacle_id
-        });
-        console.log(index);
-        this.showErrorOne.splice(index, 1);
-        payload.obstacle_state = 1;
-        this.showErrorTwo.push(payload)
+       this.$post("/updateObstacle", {
+         "obstacle_id": payload.obstacle.obstacle_id,
+         "obstacle_state": 1
+       }).then(res => {
+         console.log(res);
+         if (res.code === "000") {
+           this.$message.success("修改成功");
+           this.loadUnDo();
+           this.loadDoing();
+           this.loadDone()
+         } else {
+           this.$message.warning(res.msg)
+         }
+       }).catch(err => {
+         console.log(err);
+         this.$message.error("未知错误")
+       })
       },
       finishDone(payload) {
-        let index = this.showErrorTwo.findIndex(item => {
-          return item.obstacle_id === payload.obstacle_id
-        });
-        console.log(index);
-        this.showErrorTwo.splice(index, 1);
-        payload.obstacle_state = 2;
-        payload.obstacle_completiontime = new Date().getTime()
-        this.showErrorThree.push(payload)
+        this.$post("/updateObstacle", {
+          "obstacle_id": payload.obstacle.obstacle_id,
+          "obstacle_state": 2
+        }).then(res => {
+          console.log(res);
+          if (res.code === "000") {
+            this.$message.success("修改成功");
+            this.loadUnDo();
+            this.loadDoing();
+            this.loadDone()
+          } else {
+            this.$message.warning(res.msg)
+          }
+        }).catch(err => {
+          console.log(err);
+          this.$message.error("未知错误")
+        })
       },
       deleteShow(payload) {
         if (payload.obstacle_state === 0) {
