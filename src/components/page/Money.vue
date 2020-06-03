@@ -33,7 +33,7 @@
         <el-table-column label="应交租金" align="center">
           <template slot-scope="scope">￥{{scope.row.rent.rent_price}}</template>
         </el-table-column>
-        <el-table-column label="创建时间" align="center">
+        <el-table-column label="截止日期" align="center">
           <template
             slot-scope="scope"
           >{{scope.row.rent.rent_time}}</template>
@@ -102,14 +102,14 @@
               <!--style="width: 100%;"-->
             <!--&gt;</el-date-picker>-->
           <!--</el-form-item>-->
-          <!--<el-form-item label="结束时间" style="width: 274px">-->
-            <!--<el-date-picker-->
-              <!--type="date"-->
-              <!--placeholder="开始日期"-->
-              <!--v-model="newMoney.rent_endtime"-->
-              <!--style="width: 100%;"-->
-            <!--&gt;</el-date-picker>-->
-          <!--</el-form-item>-->
+          <el-form-item label="截止日期" style="width: 274px">
+            <el-date-picker
+              type="date"
+              placeholder="截止日期"
+              v-model="newMoney.rent_time"
+              style="width: 100%;"
+            ></el-date-picker>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onChange">确认</el-button>
             <el-button @click="cancel">取消</el-button>
@@ -182,7 +182,7 @@
           console.log(res);
           if (res.code === "000") {
             this.$message.success("修改成功");
-            this.showNo()
+            this.showNO()
           } else {
             this.$message.warning(res.msg)
           }
@@ -211,7 +211,8 @@
         this.$post("/AddRent", {
           "landlord_id": this.userInfo.landlord_id,
           "tenant_id": this.newMoney.tenant_id,
-          "rent_price": this.newMoney.rent_price
+          "rent_price": this.newMoney.rent_price,
+          "rent_time": this.newMoney.rent_time
         }).then(res => {
           console.log(res);
           if (res.code === "000") {
