@@ -25,7 +25,7 @@
         </el-table-column>
         <el-table-column label="租客" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.tenant.tenant_realname}}</span>
+            <span>{{scope.row.tenant.tenant_realname}} ({{scope.row.tenant.tenant_nickname}})</span>
           </template>
         </el-table-column>
         <el-table-column prop="house.housingresources_renttype" label="租金类型" align="center"></el-table-column>
@@ -67,7 +67,7 @@
       </div>
     </div>
     <el-dialog :visible.sync="showPaper" title="查看/打印房屋租赁合同" custom-class="paper-show">
-      <show-paper :scope="paper"></show-paper>
+      <show-paper :scope="paper" @cancel="showPaper = false"></show-paper>
     </el-dialog>
     <el-dialog :title="title" :visible.sync="dialogVisiable" width="30%">
       <div class="from-box">
@@ -87,6 +87,7 @@
                 v-model="paperForm.tenant.tenant_nickname"
                 clearable
                 class="search-el"
+                :disabled="editPaper"
                 :fetch-suggestions="querySearchAsync"
                 placeholder="输入租客id搜索"
                 @select="handleSelect"
@@ -212,10 +213,13 @@
         this.$post("/selectContractListByLandlordId", this.query).then(res => {
           if (res.code === "000") {
             this.showData = res.contractInfoList.map(item => {
-              item.house =  {
-                housingresources_name:"21312",
-                housingresources_renttype: "押一付一"
-              }
+              // item.house =  {
+              //   housingresources_name:"21312",
+              //   housingresources_renttype: "押一付一"
+              // }
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             })
           } else {
@@ -251,7 +255,11 @@
         else {
           this.$post("/selectTenantById", params).then(res => {
             if (res.code === "000") {
-              cb([res.tenant])
+              if (res.tenant) {
+                cb([res.tenant])
+              } else {
+                cb()
+              }
             } else {
               // this.$message.warning(res.msg)
             }
@@ -275,8 +283,8 @@
         }).then(res => {
           console.log(res);
           if (res.code === "000") {
-            this.$message.success("修改成功")
-            this.loadPaper()
+            this.$message.success("修改成功");
+            this.loadPaper();
             this.dialogVisiable = false
           } else {
             this.$message.warning(res.msg)

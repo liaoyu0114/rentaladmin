@@ -116,7 +116,7 @@ export default {
             value: false,
             param: {
                 username: '18382389882',
-                password: '123456'
+                password: '12345678'
             },
             paramRegist: {
                 "landlord_phone": "",

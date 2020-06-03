@@ -406,6 +406,9 @@
         console.log(file);
         console.log(fileList);
       },
+      preText (pretext) {
+        return pretext.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;")
+      },
       loadHouse() {
         this.$post("/selectHousingresourcesByLandlordId", this.query).then(res => {
           if (res.code === "000") {
@@ -489,6 +492,7 @@
           if (valid) {
             this.newForm.landlord_id = this.userInfo.landlord_id;
             let data = JSON.parse(JSON.stringify(this.newForm));
+            data.housingresources_introduce = this.preText(data.housingresources_introduce);
             data.housingresources_pic = data.housingresources_pic.map(item => {
               return item.url
             });

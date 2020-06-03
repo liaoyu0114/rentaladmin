@@ -148,14 +148,17 @@
           if (res.code === "000") {
             this.oneCount = res.count
             this.showErrorOne = res.obstacleInfoList.map(item => {
-              item.house = {
-                housingresources_type: {
-                  first: "",
-                  second: "",
-                  third: ""
-                },
-                housingresources_pic: []
-              };
+              // item.house = {
+              //   housingresources_type: {
+              //     first: "",
+              //       second: "",
+              //       third: ""
+              //   },
+              //   housingresources_pic: []
+              // };
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             })
           }
@@ -167,14 +170,17 @@
           if (res.code === "000") {
             this.twoCount = res.count;
             this.showErrorTwo = res.obstacleInfoList.map(item => {
-              item.house = {
-                housingresources_type: {
-                  first: "",
-                  second: "",
-                  third: ""
-                },
-                housingresources_pic: []
-              };
+              // item.house = {
+              //   housingresources_type: {
+              //     first: "",
+              //     second: "",
+              //     third: ""
+              //   },
+              //   housingresources_pic: []
+              // };
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             })
           }
@@ -186,29 +192,32 @@
           if (res.code === "000") {
             this.threeCount = res.count;
             this.showErrorThree = res.obstacleInfoList.map(item => {
-              item.house = {
-                housingresources_type: {
-                  first: "",
-                  second: "",
-                  third: ""
-                },
-                housingresources_pic: []
-              }
+              // item.house = {
+              //   housingresources_type: {
+              //     first: "",
+              //     second: "",
+              //     third: ""
+              //   },
+              //   housingresources_pic: []
+              // }
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             })
           }
         })
       },
       pageOneChange(val) {
-        this.showErrorOneQuery.currIndex = val
+        this.showErrorOneQuery.currIndex = val;
         this.loadUnDo()
       },
       pageTwoChange(val) {
-        this.showErrorTwoQuery.currIndex = val
+        this.showErrorTwoQuery.currIndex = val;
         this.loadDoing()
       },
       pageThreeChange(val) {
-        this.showErrorThreeQuery.currIndex = val
+        this.showErrorThreeQuery.currIndex = val;
         this.loadDone()
       },
       beginDone(payload) {
@@ -269,7 +278,7 @@
 
     },
     computed: {
-      ...mapGetters(["userInfo", "house", "userInfoU"]),
+      ...mapGetters(["userInfo"]),
     }
   }
 </script>

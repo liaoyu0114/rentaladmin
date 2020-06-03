@@ -161,7 +161,7 @@
       this.leaseOneQuery.landlord_id = this.userInfo.landlord_id;
       this.newMoney.landlord_id = this.userInfo.landlord_id;
       this.showNO();
-      this.loadRentOne();
+        this.loadRentOne();
     },
     activated() {
       this.showNO();
@@ -181,7 +181,7 @@
         }).then(res => {
           console.log(res);
           if (res.code === "000") {
-            this.$message.success("修改成功")
+            this.$message.success("修改成功");
             this.showNo()
           } else {
             this.$message.warning(res.msg)

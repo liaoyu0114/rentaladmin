@@ -71,8 +71,8 @@
           </div>
         </el-form-item>
         <el-form-item label="性别" prop="landlord_sex">
-          <el-radio v-model="temp.landlord_sex" label="1">男</el-radio>
-          <el-radio v-model="temp.landlord_sex" label="0">女</el-radio>
+          <el-radio v-model="temp.landlord_sex" :label="1">男</el-radio>
+          <el-radio v-model="temp.landlord_sex" :label="0">女</el-radio>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="changeProfile">确定</el-button>
@@ -89,13 +89,13 @@
         ref="changePass"
       >
         <el-form-item label="旧密码" prop="old">
-          <el-input v-model="rePassword.old" placeholder="请输入旧密码"></el-input>
+          <el-input v-model="rePassword.old" placeholder="请输入旧密码" type="password"></el-input>
         </el-form-item>
         <el-form-item label="新密码" prop="new">
-          <el-input v-model="rePassword.new" placeholder="请输入新密码"></el-input>
+          <el-input v-model="rePassword.new" placeholder="请输入新密码" type="password"></el-input>
         </el-form-item>
         <el-form-item label="重复密码" prop="reNew">
-          <el-input v-model="rePassword.reNew" placeholder="再次输入新密码"></el-input>
+          <el-input v-model="rePassword.reNew" placeholder="再次输入新密码" type="password"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="changePassFunc('changePass')">确定</el-button>
@@ -219,7 +219,7 @@
                 this.$store.commit("setUserInfo", res.Landlord);
                 this.$message.success("修改成功");
                 this.diaVisiable = false;
-                this.$refs.temp.resetField()
+                this.$refs.temp.resetFields()
               } else {
                 this.$message.warning(res.msg)
               }
@@ -240,8 +240,24 @@
       changePassFunc(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            this.$message.success('修改成功');
-            this.diaVisiable = false;
+            this.$post("/updateLandlord", {
+              "landlord_id": this.userInfo.landlord_id,
+              "landlord_password": this.rePassword.new
+            }).then(res => {
+              console.log(res);
+              if (res.code === "000") {
+                this.$message.success("修改成功, 请重新登录")
+                this.handleCommand()
+                this.$store.commit("setUserInfo", {})
+                // this.diaVisiable = false
+                // this.$refs.changePass.resetFields()
+              } else {
+                this.$message.warning(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("未知错误")
+            })
           }
         });
       },
@@ -290,7 +306,20 @@
               req.onError(req.file);
             });
         });
-      }
+      },
+      beforeUpload(file) {
+        const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+        const isLt10M = file.size / 1024 / 1024 < 10;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG/PNG 格式!');
+        }
+        if (!isLt10M) {
+          this.$message.error('上传头像图片大小不能超过 10MB!');
+        }
+        return isJPG && isLt10M;
+      },
+
     },
     mounted() {
       this.temp = JSON.parse(JSON.stringify(this.userInfo));

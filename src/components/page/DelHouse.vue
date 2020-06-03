@@ -12,7 +12,7 @@
             <el-table-column>
               <template slot-scope="scope">
                 <show-house-item
-                  :scope="scope"
+                  :scope="scope.row"
                   @cannelShow="cannelShow"
                   @deleteShow="deleteShow"
                 ></show-house-item>
@@ -38,7 +38,7 @@
               <el-table-column>
                 <template slot-scope="scope">
                   <show-house-item
-                    :scope="scope"
+                    :scope="scope.row"
                     @cannelShow="cannelShow"
                     @deleteShow="deleteShow"></show-house-item>
                 </template>
@@ -111,8 +111,8 @@
       ShowHouseItem
     },
     created() {
-      this.showHouseTwoQuery.landlord_id = this.userInfo.landlord_id
-      this.showHouseOneQuery.landlord_id = this.userInfo.landlord_id
+      this.showHouseTwoQuery.landlord_id = this.userInfo.landlord_id;
+      this.showHouseOneQuery.landlord_id = this.userInfo.landlord_id;
 
       this.loadApplyUn();
       this.loadApplyDone()
@@ -129,15 +129,18 @@
             console.log(res);
             if (res.code === "000") {
               this.oneCount = res.count;
-              this.showHouseOne = rres.applyInfoList.map(item => {
-                item.house = {
-                  housingresources_pic:[],
-                  housingresources_type: {
-                    first: "",
-                    second: "",
-                    third: ""
-                  }
-                };
+              this.showHouseOne = res.applyInfoList.map(item => {
+                // item.house = {
+                //   housingresources_pic:[],
+                //   housingresources_type: {
+                //     first: "",
+                //     second: "",
+                //     third: ""
+                //   }
+                // };
+                item.house = item.housingresources;
+                item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+                item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
                 return item
               })
             }
@@ -149,16 +152,19 @@
           this.$post("/selectApplyListByLandlordId", this.showHouseTwoQuery).then(res => {
             console.log(res);
             if (res.code === "000") {
-              this.twoCount = res.count
-              this.showHouseTwo = res.res.applyInfoList.map(item => {
-                item.house = {
-                  housingresources_pic:[],
-                  housingresources_type: {
-                    first: "",
-                    second: "",
-                    third: ""
-                  }
-                };
+              this.twoCount = res.count;
+              this.showHouseTwo = res.applyInfoList.map(item => {
+                // item.house = {
+                //   housingresources_pic:[],
+                //   housingresources_type: {
+                //     first: "",
+                //     second: "",
+                //     third: ""
+                //   }
+                // };
+                item.house = item.housingresources;
+                item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+                item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
                 return item
               })
             }

@@ -67,7 +67,7 @@
             ...mapGetters(["userInfo"])
         },
       created() {
-        this.loadHouse()
+        // this.loadHouse()
       },
         methods: {
           loadHouse() {

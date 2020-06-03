@@ -117,14 +117,17 @@
             if (res.code === "000") {
               this.onecount = res.count
               this.showHouseOne = res.applyInfoList.map(item => {
-                item.house = {
-                  housingresources_pic:[],
-                  housingresources_type: {
-                    first: "",
-                    second: "",
-                    third: ""
-                  }
-                };
+                // item.house = {
+                //   housingresources_pic:[],
+                //   housingresources_type: {
+                //     first: "",
+                //     second: "",
+                //     third: ""
+                //   }
+                // };
+                item.house = item.housingresources;
+                item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+                item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
                 return item
               })
             }
@@ -138,14 +141,17 @@
             if (res.code === "000") {
               this.twocount = res.count
               this.showHouseTwo = res.applyInfoList.map(item => {
-                item.house = {
-                  housingresources_pic:[],
-                  housingresources_type: {
-                    first: "",
-                    second: "",
-                    third: ""
-                  }
-                };
+                // item.house = {
+                //   housingresources_pic:[],
+                //   housingresources_type: {
+                //     first: "",
+                //     second: "",
+                //     third: ""
+                //   }
+                // };
+                item.house = item.housingresources;
+                item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+                item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
                 return item
               })
             }

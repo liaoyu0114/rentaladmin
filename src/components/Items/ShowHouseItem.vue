@@ -64,7 +64,7 @@
         },
       created() {
         console.log(this.scope);
-        this.loadHouse()
+        // this.loadHouse()
       },
         methods: {
           loadHouse() {

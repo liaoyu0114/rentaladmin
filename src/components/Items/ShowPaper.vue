@@ -26,14 +26,14 @@
         </div>
 
     <div class="button">
-      <div>
-        <el-button>修改合同</el-button>
-      </div>
+      <!--<div>-->
+        <!--<el-button>修改合同</el-button>-->
+      <!--</div>-->
       <div>
         <el-button v-print="'#print'">打印合同</el-button>
       </div>
       <div>
-        <el-button>返回</el-button>
+        <el-button @click="cancel">返回</el-button>
       </div>
     </div>
   </div>
@@ -46,7 +46,7 @@
             scope: {}
         },
       created() {
-          this.$post("/")
+          // this.$post("/")
       },
       methods: {
         loadHouse() {
@@ -66,6 +66,9 @@
             this.$message.error("网络错误");
           });
         },
+        cancel() {
+          this.$emit("cancel")
+        }
       }
     };
 </script>

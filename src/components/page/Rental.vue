@@ -212,7 +212,12 @@
         else {
           this.$post("/selectTenantById", params).then(res => {
             if (res.code === "000") {
-              cb([res.tenant])
+              if (res.tenant) {
+                cb([res.tenant])
+              } else {
+                cb()
+              }
+
             } else {
               // this.$message.warning(res.msg)
             }
@@ -249,14 +254,17 @@
           console.log(res);
           if (res.code === "000") {
             this.leaseOrderOne = res.leaseInfoList.map(item => {
-              item.house = {
-                housingresources_pic: [],
-                housingresources_type: {
-                  first: "",
-                  second: "",
-                  third: ""
-                }
-              }
+              // item.house = {
+              //   housingresources_pic: [],
+              //   housingresources_type: {
+              //     first: "",
+              //     second: "",
+              //     third: ""
+              //   }
+              // }
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             });
           } else {
@@ -275,14 +283,17 @@
           console.log(res);
           if (res.code === "000") {
             this.leaseOrderTwo = res.leaseInfoList.map(item => {
-              item.house = {
-                housingresources_pic: [],
-                housingresources_type: {
-                  first: "",
-                  second: "",
-                  third: ""
-                }
-              };
+              // item.house = {
+              //   housingresources_pic: [],
+              //   housingresources_type: {
+              //     first: "",
+              //     second: "",
+              //     third: ""
+              //   }
+              // };
+              item.house = item.housingresources;
+              item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
+              item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
               return item
             });
           } else {

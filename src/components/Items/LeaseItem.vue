@@ -58,7 +58,7 @@
       ...mapGetters(['house', 'userInfo', 'userInfoU'])
     },
     created() {
-      this.loadHouse()
+      // this.loadHouse()
     },
     methods: {
       loadHouse() {
