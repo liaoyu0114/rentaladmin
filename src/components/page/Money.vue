@@ -242,11 +242,24 @@
           type: 'warning'
         })
           .then(() => {
-            this.showData.splice(index, 1)
-            this.$message({
-              message: `删除了ID为${row.rent.rent_id}的条目`,
-              type: 'success'
-            });
+            this.$post("/deleteRent", {
+              "rent_id": row.rent.rent_id
+            }).then(res => {
+              console.log(res);
+              if (res.code === "000") {
+                this.$message.success("删除成功");
+                if (this.query.rent_type === 0) {
+                  this.showNO()
+                } else {
+                  this.showYes()
+                }
+              } else {
+                this.$message.warning(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("未知错误")
+            })
           })
           .catch(() => {
             this.$message.error('发生未知错误，删除失败');

@@ -262,22 +262,38 @@
         })
       },
       deleteShow(payload) {
-        if (payload.obstacle.obstacle_state === 0) {
-          let index = this.showErrorOne.findIndex(item => {
-            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
-          });
-          this.showErrorOne.splice(index, 1);
-        } else if (payload.obstacle.obstacle_state === 1){
-          let index = this.showErrorTwo.findIndex(item => {
-            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
-          });this.showErrorTwo.splice(index, 1);
-
-        } else {
-          let index = this.showErrorThree.findIndex(item => {
-            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
-          });
-          this.showErrorThree.splice(index, 1);
-        }
+        this.$post("/deleteObstacle", {
+          "obstacle_id": payload.obstacle.obstacle_id
+        }).then(res => {
+          console.log(res);
+          if (res.code === "000") {
+            this.$message.success("删除成功")
+            this.loadDone();
+            this.loadDoing();
+            this.loadUnDo()
+          } else {
+            this.$message.warning(res.msg)
+          }
+        }).catch(err => {
+          console.log(err);
+          this.$message.error("未知错误")
+        })
+        // if (payload.obstacle.obstacle_state === 0) {
+        //   let index = this.showErrorOne.findIndex(item => {
+        //     return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
+        //   });
+        //   this.showErrorOne.splice(index, 1);
+        // } else if (payload.obstacle.obstacle_state === 1){
+        //   let index = this.showErrorTwo.findIndex(item => {
+        //     return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
+        //   });this.showErrorTwo.splice(index, 1);
+        //
+        // } else {
+        //   let index = this.showErrorThree.findIndex(item => {
+        //     return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
+        //   });
+        //   this.showErrorThree.splice(index, 1);
+        // }
       }
 
     },

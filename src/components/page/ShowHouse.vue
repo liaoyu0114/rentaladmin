@@ -192,22 +192,22 @@
         })
       },
       deleteShow(payload) {
-        console.log(payload);
-        if (payload.apply.apply_state === 0) {
-          let index = this.showHouseOne.findIndex(item => {
-            return item.apply.apply_id === payload.apply.apply_id
-          });
-          console.log(index);
-          this.showHouseOne.splice(index, 1);
-        } else {
-          let index = this.showHouseTwo.findIndex(item => {
-            return item.apply.apply_id === payload.apply.apply_id
-          });this.showHouseTwo.splice(index, 1); console.log(index);
-
-
-        }
+        this.$post("/deleteApply", {
+          "apply_id": payload.apply.apply_id
+        }).then(res => {
+          console.log(res);
+          if (res.code === "000") {
+            this.$message.success("删除成功");
+            this.loadApplyUn();
+            this.loadApplyDone();
+          } else {
+            this.$message.warning(res.msg)
+          }
+        }).catch(err => {
+          console.log(err);
+          this.$message.error("未知错误")
+        })
       }
-
     },
     computed: {
       ...mapGetters(["userInfo", "house", "userInfoU"]),

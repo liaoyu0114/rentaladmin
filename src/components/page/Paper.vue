@@ -358,8 +358,20 @@
           type: 'warning'
         })
           .then(() => {
-            this.$message.success('删除成功');
-            this.showData.splice(index, 1);
+            this.$post("/deleteContract", {
+              "contract_id": row.contract.contract_id
+            }).then(res => {
+              console.log(res);
+              if (res.code === "000") {
+                this.$message.success("删除成功");
+                this.loadPaper()
+              } else {
+                this.$message.warning(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("未知错误")
+            })
           })
           .catch(() => {});
       },
