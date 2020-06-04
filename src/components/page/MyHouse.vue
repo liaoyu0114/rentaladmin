@@ -171,11 +171,26 @@
           <el-input v-model="editForm.housingresources_introduce" type="textarea"></el-input>
         </el-form-item>
         <el-form-item label="实景照片">
-          <el-row :gutter="10">
-            <el-col :span="7" v-for="(item,index) in editForm.housingresources_pic" :key="index">
-              <el-image :src="item" style="border-radius: 10px"></el-image>
-            </el-col>
-          </el-row>
+          <el-upload
+            ref="upload"
+            :action="domin"
+            :http-request='qiniuUp2'
+            multiple
+            :limit="9"
+            :before-upload="beforeUpload"
+            :on-success="uploadSuccess"
+            :on-remove="removeEdit"
+            list-type="picture-card"
+            :file-list="editForm.housingresources_pic"
+          >
+            <el-button size="small" type="primary" plain>点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10mb</div>
+          </el-upload>
+          <!--<el-row :gutter="10">-->
+            <!--<el-col :span="7" v-for="(item,index) in editForm.housingresources_pic" :key="index">-->
+              <!--<el-image :src="item" style="border-radius: 10px"></el-image>-->
+            <!--</el-col>-->
+          <!--</el-row>-->
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -287,7 +302,7 @@
             :limit="9"
             :before-upload="beforeUpload"
             :on-success="uploadSuccess"
-            :on-remove="remove"
+            :on-remove="removeNew"
             :file-list="newForm.housingresources_pic"
           >
             <el-button size="small" type="primary" plain>点击上传</el-button>
@@ -402,8 +417,20 @@
       this.loadHouse()
     },
     methods: {
-      remove(file, fileList) {
+      removeEdit(file, fileList) {
         console.log(file);
+        let index = this.editForm.housingresources_pic.findIndex(item => {
+          return item.url === file.url
+        })
+        this.editForm.housingresources_pic.splice(index, 1)
+        console.log(fileList);
+      },
+      removeNew(file, fileList) {
+        console.log(file);
+        let index = this.newForm.housingresources_pic.findIndex(item => {
+          return item.url === file.url
+        })
+        this.newForm.housingresources_pic.splice(index, 1)
         console.log(fileList);
       },
       preText (pretext) {
@@ -416,7 +443,7 @@
 
             this.showData = res.housingresourceslist.map(item => {
               item.housingresources_pic = JSON.parse(item.housingresources_pic);
-              item.housingresources_type = JSON.parse(item.housingresources_type)
+              item.housingresources_type = JSON.parse(item.housingresources_type);
               return item
             })
 
@@ -552,6 +579,37 @@
           })
         })
       },
+      qiniuUp2(req) {
+        // 重命名要上传的文件
+        const keyname = btoa(req.file.name.split(".")[0]) + "." + req.file.name.split(".")[1];
+
+        //axio配置
+        const config = {
+          headers: {'Content-Type': 'multipart/form-data'},
+        };
+
+        //获取七牛云token
+        getToken().then(res => {
+          let formdata = new FormData();
+          formdata.append('file', req.file);
+          formdata.append('token', res.uploadToken);
+          formdata.append('key', keyname);
+          // 获取到凭证之后再将文件上传到七牛云空间
+          axios.post(this.domin, formdata, config).then(res => {
+            console.log(res);
+            let url = this.qiniuaddr + '/' + res.data.key;
+            this.editForm.housingresources_pic.push({
+              name: req.file.name,
+              url: url
+            });
+            req.onSuccess(req.file);
+          }).catch(err => {
+            console.log(err);
+            //上传失败事件
+            req.onError(req.file);
+          })
+        })
+      },
       // 触发搜索按钮
       handleSearch() {
         if (this.query.housingresources_name === '') return;
@@ -594,15 +652,41 @@
       // 编辑操作
       handleEdit(index, row) {
         this.idx = index;
-        this.editForm = row;
+        this.editForm = JSON.parse(JSON.stringify(row));
+        this.editForm.housingresources_pic = this.editForm.housingresources_pic.map(item => {
+          console.log(item);
+          return {
+            name: "",
+            url: item
+          }
+        })
         this.editVisible = true;
       },
       // 保存编辑
       saveEdit(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+            let data = JSON.parse(JSON.stringify(this.editForm));
+            data.housingresources_pic = data.housingresources_pic.map(item => {
+              return item.url
+            })
+            data.housingresources_pic = JSON.stringify(data.housingresources_pic)
+            data.housingresources_type = JSON.stringify(data.housingresources_type)
+            this.$post("/updateHousingresourcesinfo", data).then(res => {
+              console.log(res);
+              if (res.code === "000") {
+                this.$message.success("修改成功");
+                this.loadHouse();
+                this.editVisible = false;
+              } else {
+                this.$message.warning(res.msg)
+              }
+            }).catch(err => {
+              console.log(err);
+              this.$message.error("未知错误")
+            });
+
+            // this.$message.success(`修改第 ${this.idx + 1} 行成功`);
           } else {
             console.log('error submit!!');
             return false;
