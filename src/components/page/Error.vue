@@ -156,6 +156,7 @@
               //   },
               //   housingresources_pic: []
               // };
+              item.obstacle.obstacle_pic = JSON.parse(item.obstacle.obstacle_pic)
               item.house = item.housingresources;
               item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
               item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
@@ -178,6 +179,7 @@
               //   },
               //   housingresources_pic: []
               // };
+              item.obstacle.obstacle_pic = JSON.parse(item.obstacle.obstacle_pic)
               item.house = item.housingresources;
               item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
               item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
@@ -200,6 +202,7 @@
               //   },
               //   housingresources_pic: []
               // }
+              item.obstacle.obstacle_pic = JSON.parse(item.obstacle.obstacle_pic)
               item.house = item.housingresources;
               item.house.housingresources_type = JSON.parse(item.house.housingresources_type);
               item.house.housingresources_pic = JSON.parse(item.house.housingresources_pic);
@@ -259,20 +262,21 @@
         })
       },
       deleteShow(payload) {
-        if (payload.obstacle_state === 0) {
+        if (payload.obstacle.obstacle_state === 0) {
           let index = this.showErrorOne.findIndex(item => {
-            return item.obstacle_id === payload.obstacle_id
+            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
           });
           this.showErrorOne.splice(index, 1);
-        } else if (payload.obstacle_state === 1){
+        } else if (payload.obstacle.obstacle_state === 1){
           let index = this.showErrorTwo.findIndex(item => {
-            return item.obstacle_id === payload.obstacle_id
+            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
           });this.showErrorTwo.splice(index, 1);
 
         } else {
           let index = this.showErrorThree.findIndex(item => {
-            return item.obstacle_id === payload.obstacle_id
-          });this.showErrorThree.splice(index, 1);
+            return item.obstacle.obstacle_id === payload.obstacle.obstacle_id
+          });
+          this.showErrorThree.splice(index, 1);
         }
       }
 

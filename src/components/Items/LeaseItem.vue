@@ -18,8 +18,9 @@
           <div class="lease-user-avatar">
             <el-avatar :src="scope.tenant.tenant_pic" :size="75"></el-avatar>
           </div>
-          <div class="lease-user-name">{{scope.tenant.tenant_nickname}}</div>
-          <div class="lease-user-contact">{{scope.tenant.tenant_contact}}</div>
+          <div class="lease-user-name">租客ID: {{scope.tenant.tenant_id}}</div>
+          <div class="lease-user-name">租客名称：{{scope.tenant.tenant_nickname}}</div>
+          <div class="lease-user-contact">联系方式：{{scope.tenant.tenant_contact}}</div>
         </el-col>
         <el-col :span="6" class="lease-house-pic">
           <el-image

@@ -4,9 +4,10 @@
       <div slot="header" class="clearfix">
         <span class="lease-id">ID：{{scope.obstacle.obstacle_id}}</span>
         <span class="show-time">
-          创建时间：{{scope.obstacle.obstacle_time}}
+          创建时间：{{scope.obstacle.obstacle_time | formatDate("YYYY-MM-DD HH:mm:ss")}}
         </span>
-        <span class="com-time">完成时间： <span v-if="scope.obstacle.obstacle_completiontime">{{scope.obstacle.obstacle_completiontime}}</span>
+        <span class="com-time">完成时间： <span v-if="scope.obstacle.obstacle_completiontime">
+          {{scope.obstacle.obstacle_completiontime | formatDate("YYYY-MM-DD HH:mm:ss")}}</span>
         <span v-else>未完成</span></span>
         <div class="header-button">
           <div v-if="scope.obstacle.obstacle_state !== 2" style="margin-right: 10px">
@@ -23,18 +24,22 @@
             <el-avatar :src="scope.tenant.tenant_pic" :size="75"></el-avatar>
           </div>
           <div class="lease-user-name">
-            {{scope.tenant.tenant_nickname}}
+            租客ID：{{scope.tenant.tenant_id}}
+          </div>
+          <div class="lease-user-name">
+            租客名称：{{scope.tenant.tenant_nickname}}
           </div>
           <div class="lease-user-contact">
-            {{scope.tenant.tenant_contact}}
+            联系方式：{{scope.tenant.tenant_contact}}
           </div>
         </el-col>
         <el-col :span="6" class="lease-house-pic">
           <el-image
                   class="item-image"
                         fit="contain"
-                  :src="scope.house.housingresources_pic[0]"
-                  :preview-src-list="scope.house.housingresources_pic"></el-image>
+                  :src="scope.obstacle.obstacle_pic[0]"
+                  :preview-src-list="scope.obstacle.obstacle_pic"></el-image>
+          <div>故障图片详情，点击查看更多</div>
         </el-col>
         <el-col :span="12" class="lease-houser">
           <div class="lease-house-name">
@@ -46,7 +51,7 @@
           </div>
         </el-col>
         <el-col :span="24" class="show-remark">
-          {{scope.obstacle.obstacle_detail}}
+          <strong>故障详情：</strong>{{scope.obstacle.obstacle_detail}}
         </el-col>
       </el-row>
     </el-card>
@@ -155,6 +160,10 @@
     width: 100%;
     text-align: center;
   }
+  .show-remark {
+    font-size: 14px;
+    font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
   .lease-houser {
     display: flex;
     justify-content: center;
@@ -165,6 +174,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
+    color: #999999;
+    font-size: 8px;
   }
   .lease-house-name {
     width: 100%;

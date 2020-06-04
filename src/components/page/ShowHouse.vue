@@ -165,16 +165,6 @@
           this.search = this.orders;
         }, 3000 * Math.random());
       },
-      stateAdd(orderId) {
-        this.orders.forEach(item => {
-          console.log(item);
-          if (item.orderId === orderId) {
-            if (item.state <= 3) {
-              item.state += 1;
-            }
-          }
-        });
-      },
       pageOneChange(val) {
         this.showHouseOneQuery.currIndex = val;
         this.loadApplyUn()
@@ -202,15 +192,18 @@
         })
       },
       deleteShow(payload) {
-        if (payload.apply_state === 0) {
+        console.log(payload);
+        if (payload.apply.apply_state === 0) {
           let index = this.showHouseOne.findIndex(item => {
-            return item.apply_id === payload.apply_id
+            return item.apply.apply_id === payload.apply.apply_id
           });
+          console.log(index);
           this.showHouseOne.splice(index, 1);
         } else {
           let index = this.showHouseTwo.findIndex(item => {
-            return item.apply_id === payload.apply_id
-          });this.showHouseTwo.splice(index, 1);
+            return item.apply.apply_id === payload.apply.apply_id
+          });this.showHouseTwo.splice(index, 1); console.log(index);
+
 
         }
       }

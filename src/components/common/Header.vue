@@ -16,6 +16,8 @@
           <div class="user-name">
             <div class="el-dropdown-link" @click="showProfileFunc">个人信息</div>
             <div class="el-dropdown-link" @click="changPassWord">修改密码</div>
+            <div class="el-dropdown-link" @click="goRental">
+            </div>
             <div class="el-dropdown-link" @click="handleCommand">退出登录</div>
           </div>
         </el-popover>
@@ -185,13 +187,12 @@
       };
     },
     computed: {
-      ...mapGetters(['userInfo']),
-      username() {
-        let username = localStorage.getItem('ms_username');
-        return username ? username : this.name;
-      }
+      ...mapGetters(['userInfo'])
     },
     methods: {
+      goRental() {
+        window.open("https://rental.hhh233.xyz")
+      },
       // 展示弹窗
       showProfileFunc() {
         this.diaVisiable = true;
@@ -217,6 +218,7 @@
               console.log(res);
               if (res.code === "000") {
                 this.$store.commit("setUserInfo", res.Landlord);
+                this.temp = JSON.parse(JSON.stringify(this.userInfo));
                 this.$message.success("修改成功");
                 this.diaVisiable = false;
                 this.$refs.temp.resetFields()

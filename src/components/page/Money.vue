@@ -9,8 +9,8 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+        <!--<el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>-->
+        <!--<el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
         <el-button type="primary" @click="dialogVisiable = true">新增</el-button>
         <el-tabs v-model="message" @tab-click="handleClick">
           <!--<el-tab-pane label="全部" name="first"></el-tab-pane>-->
@@ -28,21 +28,21 @@
       >
         <el-table-column prop="rent.rent_id" label="租金ID" width="70" align="center"></el-table-column>
         <el-table-column label="租客昵称" align="center">
-          <template slot-scope="scope">{{scope.row.tenant.tenant_nickname}}</template>
+          <template slot-scope="scope">{{scope.row.tenant.tenant_nickname}}（ID: {{scope.row.tenant.tenant_id}}）</template>
         </el-table-column>
         <el-table-column label="应交租金" align="center">
-          <template slot-scope="scope">￥{{scope.row.rent.rent_price}}</template>
+          <template slot-scope="scope">￥{{scope.row.rent.rent_price }}</template>
         </el-table-column>
         <el-table-column label="截止日期" align="center">
           <template
             slot-scope="scope"
-          >{{scope.row.rent.rent_time}}</template>
+          >{{scope.row.rent.rent_time | formatDate("YYYY-MM-DD")}}</template>
         </el-table-column>
         <el-table-column label="缴纳时间" align="center">
           <template
             slot-scope="scope"
           >
-            <span v-if="scope.row.rent.rent_endtime">{{scope.row.rent.rent_endtime}}</span>
+            <span v-if="scope.row.rent.rent_endtime">{{scope.row.rent.rent_endtime | formatDate("YYYY-MM-DD")}}</span>
             <span v-else>暂无</span>
           </template>
         </el-table-column>
@@ -108,6 +108,8 @@
               placeholder="截止日期"
               v-model="newMoney.rent_time"
               style="width: 100%;"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="timestamp"
             ></el-date-picker>
           </el-form-item>
           <el-form-item>
@@ -172,8 +174,10 @@
     },
     methods: {
       cancel() {
-        this.dialogVisiable = false
-        this.$refs.newMoney.resetFields()
+        for (let key in this.newMoney) {
+          this.newMoney[key] = ""
+        }
+        this.dialogVisiable = false;
       },
       confirmRent(scope) {
         this.$post("/payRent", {
@@ -218,6 +222,9 @@
           if (res.code === "000") {
             this.$message.success("添加成功")
             this.dialogVisiable = false;
+            for (let key in this.newMoney) {
+              this.newMoney[key] = ""
+            }
             this.showNO()
           } else {
             this.$message.warning(res.msg)
@@ -235,9 +242,9 @@
           type: 'warning'
         })
           .then(() => {
-            this.showData.splice(index, 1);
+            this.showData.splice(index, 1)
             this.$message({
-              message: `删除了ID为${row.rent_id}的条目`,
+              message: `删除了ID为${row.rent.rent_id}的条目`,
               type: 'success'
             });
           })

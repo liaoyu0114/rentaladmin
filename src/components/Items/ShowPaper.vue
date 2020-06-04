@@ -7,7 +7,7 @@
           <p>租赁房屋地址：<span>{{scope.house.housingresources_address}}</span>　</p>　
           <p>依据《中华人民共和国合同法》有关条款，甲乙双方经过充分协商，就乙方租赁甲方房屋事宜达成如下协议：</p>
           <p>一、乙方租赁甲方房屋，以下简称租赁房屋。</p>
-          <p>二、起租时间：<span class="time-bold">{{scope.contract.contract_begintime}}</span>，退租时间：<span class="time-bold">{{scope.contract.contract_endtime}}</span>。
+          <p>二、起租时间：<span class="time-bold">{{scope.contract.contract_begintime  | formatDate("YYYY-MM-DD")}}</span>，退租时间：<span class="time-bold">{{scope.contract.contract_endtime | formatDate("YYYY-MM-DD")}}</span>。
             在合同签订之日，乙方需向甲方支付房屋租金<span class="price-color">￥{{scope.contract.contract_price}}</span>。如续租，请提前3天通知甲方，并重新办理租赁手续。<br /></p>　　　　
           <p>三、违约处理：</p>　
           <p>甲方违约：</p>　

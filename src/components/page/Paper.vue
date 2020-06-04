@@ -9,8 +9,8 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+        <!--<el-input v-model="query.name" placeholder="输入关键字搜索" class="handle-input mr10"></el-input>-->
+        <!--<el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
         <el-button type="primary" @click="newPaperFunc">新增合同</el-button>
       </div>
       <el-table :data="showData" border class="table" header-cell-class-name="table-header">
@@ -31,12 +31,12 @@
         <el-table-column prop="house.housingresources_renttype" label="租金类型" align="center"></el-table-column>
         <el-table-column label="起租时间" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.contract.contract_begintime}}</span>
+            <span>{{scope.row.contract.contract_begintime | formatDate("YYYY-MM-DD")}}</span>
           </template>
         </el-table-column>
         <el-table-column label="到期时间" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.contract.contract_endtime}}</span>
+            <span>{{scope.row.contract.contract_endtime | formatDate("YYYY-MM-DD")}}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="270" align="center">
@@ -116,6 +116,8 @@
             <el-date-picker
               type="date"
               placeholder="开始日期"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="timestamp"
               v-model="paperForm.contract_begintime"
               style="width: 100%;"
             ></el-date-picker>
@@ -124,6 +126,8 @@
             <el-date-picker
               placeholder="结束日期"
               type="date"
+              format="yyyy 年 MM 月 dd 日"
+              value-format="timestamp"
               v-model="paperForm.contract_endtime"
               style="width: 100%;"
             ></el-date-picker>
@@ -177,11 +181,6 @@
         },
         paper: {},
         temp: {
-          contract_id: 2137812,
-          contract_price: 927,
-          housingresources_renttype: '年付',
-          contract_begintime: new Date().getTime(),
-          contract_endtime: new Date().getTime() + 9999999999999
         },
         houseQuery: {
 
@@ -193,6 +192,15 @@
         house: [],
         houseArr: []
       };
+    },
+    watch: {
+      "paperForm.contract_endtime": function (val, oldVal) {
+        if (val === "") return ;
+        if (this.paperForm.contract_begintime > val) {
+          this.$message.warning("结束时间不能小于开始时间")
+          this.paperForm.contract_endtime = ""
+        }
+      }
     },
     created() {
       this.query.landlord_id = this.userInfo.landlord_id;

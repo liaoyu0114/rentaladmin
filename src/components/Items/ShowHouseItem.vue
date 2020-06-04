@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span class="lease-id">ID：{{scope.apply.apply_id}}</span>
-        <span class="show-time">创建时间：{{scope.apply.apply_time}}</span>
+        <span class="show-time">创建时间：{{scope.apply.apply_time | formatDate("YYYY-MM-DD HH:mm:ss")}}</span>
         <div class="header-button">
           <div v-if="scope.apply.apply_state === 0" style="margin-right: 10px">
             <el-button type="primary" plain  size="small" @click="cannelShow" v-if="scope.apply.apply_type === 1">已看房</el-button>
@@ -19,10 +19,13 @@
             <el-avatar :src="scope.tenant.tenant_pic" :size="75"></el-avatar>
           </div>
           <div class="lease-user-name">
-            {{scope.apply_liaison}}
+            租客ID：{{scope.tenant.tenant_id}}
+          </div>
+          <div class="lease-user-name">
+            租客名称：{{scope.apply.apply_liaison}}
           </div>
           <div class="lease-user-contact">
-            {{scope.apply_contact}}
+            联系方式：{{scope.apply.apply_contact}}
           </div>
         </el-col>
         <el-col :span="6" class="lease-house-pic">
@@ -42,7 +45,7 @@
           </div>
         </el-col>
         <el-col :span="24" class="show-remark">
-          {{scope.apply.apply_remake}}
+          <strong>申请详情：</strong>{{scope.apply.apply_remake}}
         </el-col>
       </el-row>
     </el-card>
